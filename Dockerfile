@@ -15,7 +15,7 @@ WORKDIR /app
 COPY . .
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
-FROM php:8.3-apache
+FROM php:8.4-apache
 WORKDIR /var/www/html
 
 RUN apt-get update \
