@@ -10,7 +10,9 @@ RUN npm run build
 
 FROM composer:2 AS dependencies
 WORKDIR /app
-COPY composer.json composer.lock ./
+# Laravel runs `artisan package:discover` as part of Composer's install hooks.
+# It therefore needs the application files, not only composer.json and lockfile.
+COPY . .
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
 FROM php:8.3-apache
