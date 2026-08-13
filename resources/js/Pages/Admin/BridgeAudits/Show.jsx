@@ -1,0 +1,18 @@
+import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
+
+export default function BridgeAuditShow({ team }) {
+    const form = useForm({ measured_weight_grams: team.measuredWeightGrams ?? '', declared_load_grams: team.declaredLoadGrams ?? '', materials_compliant: team.materialsCompliant ?? false, dimensions_compliant: team.dimensionsCompliant ?? false, no_coating: team.noCoating ?? false, audit_notes: team.auditNotes ?? '' });
+    const submit = (event) => { event.preventDefault(); form.post(route('admin.bridge-audits.store', team.id)); };
+    const actions = <Link href={route('admin.bridge-audits.index')} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">← Voltar para organização</Link>;
+
+    return <AdminLayout title={`Auditoria — ${team.name}`} description={`Líder: ${team.leader} · ${team.course} · Código ${team.code}`} actions={actions}><Head title={`Auditoria — ${team.name}`} />
+        <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1fr_.8fr]">
+            <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100"><h2 className="text-lg font-bold">Medições da ponte</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><Field label="Peso aferido (g)" error={form.errors.measured_weight_grams}><input type="number" min="1" value={form.data.measured_weight_grams} onChange={(e) => form.setData('measured_weight_grams', e.target.value)} /></Field><Field label="Carga declarada (g)" error={form.errors.declared_load_grams}><input type="number" min="1" value={form.data.declared_load_grams} onChange={(e) => form.setData('declared_load_grams', e.target.value)} /></Field></div><p className="mt-3 text-sm text-slate-500">Limite regulamentar: 1.000 g, com tolerância máxima de 1.010 g.</p><label className="mt-6 block text-sm font-semibold">Observações<textarea value={form.data.audit_notes} onChange={(e) => form.setData('audit_notes', e.target.value)} rows="5" className="mt-2 w-full rounded-lg border-slate-200 text-sm shadow-sm focus:border-sky-600 focus:ring-sky-600" placeholder="Registre ocorrências, medidas complementares ou orientações." /></label></section>
+            <aside className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100"><h2 className="text-lg font-bold">Checklist de conformidade</h2><div className="mt-5 grid gap-3"><Check label="Materiais permitidos e junções conformes" checked={form.data.materials_compliant} onChange={(value) => form.setData('materials_compliant', value)} /><Check label="Dimensões e montagem conforme edital" checked={form.data.dimensions_compliant} onChange={(value) => form.setData('dimensions_compliant', value)} /><Check label="Sem tinta, verniz ou revestimento" checked={form.data.no_coating} onChange={(value) => form.setData('no_coating', value)} /></div><button disabled={form.processing} className="mt-7 h-11 w-full rounded-lg bg-[#172938] text-sm font-bold text-white hover:bg-[#223b50] disabled:opacity-50">{form.processing ? 'Salvando…' : 'Concluir auditoria'}</button></aside>
+        </form>
+    </AdminLayout>;
+}
+
+function Field({ label, error, children }) { return <label className="text-sm font-semibold">{label}<span className="mt-2 block">{children}</span>{error && <small className="mt-1 block text-rose-600">{error}</small>}</label>; }
+function Check({ label, checked, onChange }) { return <label className="flex cursor-pointer gap-3 rounded-lg border border-slate-200 p-4 text-sm font-medium"><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 rounded border-slate-300 text-sky-700 focus:ring-sky-600" />{label}</label>; }
