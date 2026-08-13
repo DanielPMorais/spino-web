@@ -52,7 +52,9 @@ class RegistrationController extends Controller
         DB::transaction(function () use ($request, &$teamCode): void {
             $student = $this->availableStudent($request->string('enrollment')->toString());
 
-            $activeTeams = Team::query()->lockForUpdate()->whereNot('status', 'rejected');
+            // PostgreSQL does not allow FOR UPDATE on aggregate queries such as count().
+            // The registration checks below use aggregate queries, so keep this query unlocked.
+            $activeTeams = Team::query()->whereNot('status', 'rejected');
             if ($activeTeams->count() >= config('competition.max_teams')) {
                 throw ValidationException::withMessages(['team_name' => 'Todas as vagas do concurso foram preenchidas.']);
             }
