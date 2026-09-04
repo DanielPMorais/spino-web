@@ -32,16 +32,11 @@ function voteLabel(count) {
 export default function AudienceDashboard({ ranking = [], currentTest, completedJudges = 0 }) {
     const [metric, setMetric] = useState('total');
     const [expanded, setExpanded] = useState(null);
-    const [refreshState, setRefreshState] = useState('idle');
-
     useEffect(() => {
         const timer = window.setInterval(() => router.reload({
             only: ['ranking', 'currentTest', 'completedJudges'],
             preserveScroll: true,
-            onStart: () => setRefreshState('loading'),
-            onSuccess: () => setRefreshState('idle'),
-            onError: () => setRefreshState('error'),
-        }), 5000);
+        }), 1000);
 
         return () => window.clearInterval(timer);
     }, []);
@@ -51,11 +46,7 @@ export default function AudienceDashboard({ ranking = [], currentTest, completed
         [ranking, metric],
     );
 
-    const updateText = refreshState === 'loading'
-        ? 'Atualizando resultados…'
-        : refreshState === 'error'
-            ? 'Não foi possível atualizar agora · tentando novamente'
-            : `Atualização automática · ${voteLabel(completedJudges)}`;
+    const updateText = `Atualização automática · ${voteLabel(completedJudges)}`;
 
     return <div className="audience-scoreboard">
         <Head title="Placar oficial — Concurso de Pontes de Palito">
@@ -76,7 +67,7 @@ export default function AudienceDashboard({ ranking = [], currentTest, completed
             <header className="scoreboard-hero">
                 <span className="eyebrow">Resultados da competição</span>
                 <h1>Classificação</h1>
-                <p className={refreshState === 'error' ? 'is-error' : ''} role="status" aria-live="polite">{updateText}</p>
+                <p role="status" aria-live="polite">{updateText}</p>
             </header>
 
             <section className="scoreboard-section live-test-section" aria-labelledby="live-test-title">
