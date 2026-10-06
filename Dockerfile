@@ -35,5 +35,6 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 EXPOSE 80
 
 # Schema migrations are idempotent. Set CLEAR_TEST_DATA_ON_DEPLOY=true for one
-# explicitly authorized deploy to remove test data before migrating.
-CMD ["sh", "-c", "if [ \"$CLEAR_TEST_DATA_ON_DEPLOY\" = \"true\" ]; then php artisan competition:clear-test-data --force; fi && php artisan migrate --force && apache2-foreground"]
+# explicitly authorized deploy to remove test data before migrating. Set
+# BOOTSTRAP_ADMIN_ON_DEPLOY=true once to create the first administrator.
+CMD ["sh", "-c", "if [ \"$CLEAR_TEST_DATA_ON_DEPLOY\" = \"true\" ]; then php artisan competition:clear-test-data --force; fi && php artisan migrate --force && if [ \"$BOOTSTRAP_ADMIN_ON_DEPLOY\" = \"true\" ]; then php artisan competition:bootstrap-admin --force; fi && apache2-foreground"]
