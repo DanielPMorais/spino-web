@@ -1,41 +1,63 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
-const emptyStudent = { enrollment: '', name: '', course: '' };
 const competitionPhotos = [
     {
         src: '/images/competition-2023/exposicao-pontes.jpg',
         alt: 'Pontes de palito expostas durante a competição de 2023 no Campus Caraguatatuba',
         caption: 'Exposição das pontes — edição 2023',
+        edition: 'Competição 2023',
     },
     {
         src: '/images/competition-2023/teste-carga.jpg',
         alt: 'Estudantes realizando o teste de carga de uma ponte de palitos em 2023',
         caption: 'Teste de carga das estruturas',
+        edition: 'Competição 2023',
     },
     {
         src: '/images/competition-2023/participantes.jpg',
         alt: 'Participantes da Competição de Pontes de Palito de Churrasco de 2023',
-        caption: 'Participantes e público da competição',
+        caption: 'Participantes da competição — edição 2023',
+        edition: 'Competição 2023',
+    },
+    {
+        src: '/images/competition-history/pontes-de-palito-2025-2.jpeg',
+        alt: 'Ponte de palito exposta na competição de 2025',
+        caption: 'Exposição das pontes — edição 2025',
+        edition: 'Competição 2025',
+    },
+    {
+        src: '/images/competition-history/pesagem-2025.jpeg',
+        alt: 'Pesagem e teste de carga de uma ponte de palito na competição de 2025',
+        caption: 'Teste de carga — edição 2025',
+        edition: 'Competição 2025',
+    },
+    {
+        src: '/images/competition-history/pontes-de-palito-2025.jpeg',
+        alt: 'Pontes de palito participantes da competição de 2025',
+        caption: 'Exposição das pontes — edição 2025',
+        edition: 'Competição 2025',
+    },
+    {
+        src: '/images/competition-history/ponte-palito-2025.png',
+        alt: 'Montagem com equipes e pontes da competição de palito de 2025',
+        caption: 'Pódio — edição 2025',
+        edition: 'Competição 2025',
     },
 ];
+const campusCourses = ['Técnico em Edificações', 'Bacharelado em Engenharia Civil'];
 
-export default function Create({ availability, registrationEndsAt }) {
+export default function Create({ availability, registrationEndsAt, emailVerification }) {
     const { flash } = usePage().props;
     const [role, setRole] = useState(null);
     const [successDismissed, setSuccessDismissed] = useState(false);
-    const [student, setStudent] = useState(emptyStudent);
-    const [lookupError, setLookupError] = useState('');
-    const [lookingUp, setLookingUp] = useState(false);
-    const createForm = useForm({ team_name: '', category: '', email: '', enrollment: '' });
-    const joinForm = useForm({ code: '', course: '', email: '', enrollment: '' });
+    const createForm = useForm({ team_name: '', name: '', course: '', email: '' });
+    const joinForm = useForm({ code: '', name: '', course: '', email: '' });
     const form = role === 'leader' ? createForm : joinForm;
     const countdown = useCountdown(registrationEndsAt);
 
     const chooseRole = (nextRole) => {
         setRole(nextRole);
-        setStudent(emptyStudent);
-        setLookupError('');
         createForm.clearErrors();
         joinForm.clearErrors();
     };
@@ -48,41 +70,20 @@ export default function Create({ availability, registrationEndsAt }) {
         joinForm.reset();
     };
 
-    const lookupStudent = async () => {
-        const enrollment = form.data.enrollment.trim();
-        setStudent(emptyStudent);
-        setLookupError('');
-        if (!enrollment) return;
-
-        setLookingUp(true);
-        try {
-            const response = await window.axios.get(`/inscricao/alunos/${encodeURIComponent(enrollment)}`);
-            setStudent(response.data);
-            if (role === 'member') joinForm.setData('course', response.data.course);
-        } catch (error) {
-            setLookupError(error.response?.data?.message ?? 'Não foi possível consultar a matrícula.');
-        } finally {
-            setLookingUp(false);
-        }
-    };
-
     const submit = (event) => {
         event.preventDefault();
-        if (!student.enrollment) {
-            setLookupError('Consulte uma matrícula válida antes de continuar.');
-            return;
-        }
         form.post(role === 'leader' ? route('registration.store') : route('registration.join'), {
             onSuccess: () => {
                 setRole(null);
-                setStudent(emptyStudent);
-                setLookupError('');
                 setSuccessDismissed(false);
             },
         });
     };
 
-    const hasSuccess = Boolean(flash?.success || flash?.teamCode);
+    const verification = flash?.verificationRequired
+        ? { email: flash.verificationEmail }
+        : emailVerification;
+    const hasSuccess = Boolean(flash?.success || flash?.teamCode || verification);
 
     return (
         <>
@@ -92,7 +93,7 @@ export default function Create({ availability, registrationEndsAt }) {
 
                 <main className="registration-stage">
                     {hasSuccess && !successDismissed ? (
-                        <RegistrationSuccess flash={flash} onStartAnother={startAnotherRegistration} />
+                        <RegistrationSuccess flash={flash} verification={verification} onStartAnother={startAnotherRegistration} />
                     ) : !role ? (
                         <RoleSelection
                             availability={availability}
@@ -103,13 +104,8 @@ export default function Create({ availability, registrationEndsAt }) {
                         <RegistrationForm
                             role={role}
                             form={form}
-                            student={student}
-                            lookupError={lookupError}
-                            lookingUp={lookingUp}
                             availability={availability}
                             onBack={goBack}
-                            onLookup={lookupStudent}
-                            onStudentChange={() => setStudent(emptyStudent)}
                             onSubmit={submit}
                         />
                     )}
@@ -141,7 +137,7 @@ function RoleSelection({ availability, countdown, onChoose }) {
                 <Fact icon="users" value="2 a 5 integrantes" label="por equipe" />
                 <Fact icon="trophy" value="15 equipes" label={`${availability.totalRemaining} vagas disponíveis`} />
                 <Fact icon="weight" value="Até 1 kg" label="massa total da ponte" />
-                <Fact icon="graduation" value="Campus Caraguatatuba" label="alunos matriculados" />
+                <Fact icon="graduation" value="E-mail acadêmico" label="@aluno.ifsp.edu.br" />
             </section>
 
             <section className="role-card">
@@ -159,8 +155,12 @@ function RoleSelection({ availability, countdown, onChoose }) {
     );
 }
 
-function RegistrationSuccess({ flash, onStartAnother }) {
+function RegistrationSuccess({ flash, verification, onStartAnother }) {
     const createdTeam = Boolean(flash?.teamCode);
+
+    if (verification) {
+        return <EmailVerification email={verification.email} teamCode={flash?.teamCode} onStartAnother={onStartAnother} />;
+    }
 
     return (
         <div className="registration-workspace registration-success">
@@ -184,6 +184,61 @@ function RegistrationSuccess({ flash, onStartAnother }) {
     );
 }
 
+function EmailVerification({ email, teamCode, onStartAnother }) {
+    const form = useForm({ code: '' });
+    const resend = useForm({});
+
+    const submit = (event) => {
+        event.preventDefault();
+        form.post(route('registration.verify-email'));
+    };
+
+    return (
+        <div className="registration-workspace registration-success">
+            <aside className="registration-guide">
+                <span className="eyebrow">Confirmação necessária</span>
+                <h2>Verifique seu e-mail</h2>
+                <p>Enviamos um código de seis dígitos para seu e-mail acadêmico. A participação seguirá para análise após a confirmação.</p>
+                {teamCode && <p className="verification-team-code">Código da equipe: <strong>{teamCode}</strong></p>}
+            </aside>
+            <section className="form-card">
+                <div className="form-progress" aria-label="Etapa 3 de 3">
+                    <span className="progress-step is-complete">1</span><i /><span className="progress-step is-complete">2</span><i /><span className="progress-step is-active">3</span>
+                </div>
+                <form onSubmit={submit} className="figma-form verification-form">
+                    <div className="verification-copy">
+                        <span>Código enviado para</span>
+                        <strong>{email}</strong>
+                    </div>
+                    <CompactField label="Código de confirmação" error={form.errors.code}>
+                        <input
+                            value={form.data.code}
+                            onChange={(event) => form.setData('code', event.target.value.replace(/\D/g, '').slice(0, 6))}
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength="6"
+                            placeholder="000000"
+                            disabled={form.processing}
+                        />
+                    </CompactField>
+                    <button className="orange-submit" type="submit" disabled={form.processing}>
+                        {form.processing ? 'Confirmando…' : 'Confirmar e-mail'}
+                    </button>
+                    <button
+                        type="button"
+                        className="resend-code-button"
+                        disabled={resend.processing}
+                        onClick={() => resend.post(route('registration.resend-email'))}
+                    >
+                        {resend.processing ? 'Enviando…' : 'Reenviar código'}
+                    </button>
+                    <button type="button" className="cancel-verification-button" onClick={onStartAnother}>Voltar ao início</button>
+                </form>
+            </section>
+        </div>
+    );
+}
+
 function RoleButton({ role, onClick }) {
     const leader = role === 'leader';
     return (
@@ -195,7 +250,7 @@ function RoleButton({ role, onClick }) {
     );
 }
 
-function RegistrationForm({ role, form, student, lookupError, lookingUp, availability, onBack, onLookup, onStudentChange, onSubmit }) {
+function RegistrationForm({ role, form, availability, onBack, onSubmit }) {
     const leader = role === 'leader';
     const disabled = !availability.isOpen || form.processing;
 
@@ -204,10 +259,10 @@ function RegistrationForm({ role, form, student, lookupError, lookingUp, availab
             <aside className="registration-guide">
                 <span className="eyebrow">Inscrição</span>
                 <h2>{leader ? 'Crie sua equipe' : 'Entre na equipe'}</h2>
-                <p>Use seus dados institucionais. As informações do aluno serão confirmadas na base oficial do campus.</p>
+                <p>Use seu e-mail acadêmico do IFSP. A aprovação final da participação será feita pela comissão organizadora.</p>
                 <ul>
                     <li>Equipe de 2 a 5 integrantes</li>
-                    <li>Uma equipe por aluno</li>
+                    <li>Um e-mail acadêmico por equipe</li>
                     <li>Código de convite com 8 caracteres</li>
                     <li>Confirmação individual obrigatória</li>
                 </ul>
@@ -231,43 +286,19 @@ function RegistrationForm({ role, form, student, lookupError, lookingUp, availab
                         <CompactField label="Nome da Equipe" error={form.errors.team_name}>
                             <input value={form.data.team_name} onChange={(e) => form.setData('team_name', e.target.value)} disabled={disabled} />
                         </CompactField>
-                        <CompactField label="Categoria da Equipe" error={form.errors.category}>
-                            <select value={form.data.category} onChange={(e) => form.setData('category', e.target.value)} disabled={disabled}>
-                                <option value="">Selecione a categoria da equipe</option>
-                                <option value="civil">Engenharia Civil</option>
-                                <option value="general">Ampla concorrência</option>
-                            </select>
-                        </CompactField>
-                        <CompactField label="Email acadêmico" error={form.errors.email}>
-                            <input type="email" value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} disabled={disabled} />
-                        </CompactField>
-                        <EnrollmentField form={form} disabled={disabled} error={form.errors.enrollment || lookupError} onLookup={onLookup} onChange={onStudentChange} />
-                        {student.enrollment && <StudentConfirmation student={student} />}
+                        <ParticipantFields form={form} disabled={disabled} />
                     </>
                 ) : (
                     <>
                         <CompactField label="Código Hash do Grupo" error={form.errors.code}>
                             <input value={form.data.code} onChange={(e) => form.setData('code', e.target.value.toUpperCase())} maxLength="8" disabled={disabled} />
                         </CompactField>
-                        <CompactField label="Curso" error={form.errors.course}>
-                            <select value={form.data.course} onChange={(e) => form.setData('course', e.target.value)} disabled={disabled}>
-                                <option value="">Selecione seu curso</option>
-                                {student.course && <option value={student.course}>{student.course}</option>}
-                                <option value="Engenharia Civil">Engenharia Civil</option>
-                                <option value="Tecnologia em Processos Gerenciais">Tecnologia em Processos Gerenciais</option>
-                            </select>
-                        </CompactField>
-                        <CompactField label="Email acadêmico" error={form.errors.email}>
-                            <input type="email" value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} disabled={disabled} />
-                        </CompactField>
-                        <EnrollmentField form={form} disabled={disabled} error={form.errors.enrollment || lookupError} onLookup={onLookup} onChange={onStudentChange} />
-                        {student.enrollment && <StudentConfirmation student={student} />}
+                        <ParticipantFields form={form} disabled={disabled} />
                     </>
                 )}
 
-                {lookingUp && <p className="lookup-status">Consultando matrícula…</p>}
                 {form.errors.registration && <p className="form-global-error">{form.errors.registration}</p>}
-                <button className="orange-submit" type="submit" disabled={disabled || !student.enrollment}>
+                <button className="orange-submit" type="submit" disabled={disabled}>
                     {form.processing ? 'Processando…' : leader ? 'Confirmar inscrição' : 'Entrar na equipe'}
                 </button>
             </form>
@@ -276,26 +307,9 @@ function RegistrationForm({ role, form, student, lookupError, lookingUp, availab
     );
 }
 
-function StudentConfirmation({ student }) {
-    return (
-        <div className="student-confirmation">
-            <span className="confirmation-check">✓</span>
-            <div><strong>Aluno identificado</strong><span>{student.name} · {student.course}</span></div>
-        </div>
-    );
-}
-
-function EnrollmentField({ form, disabled, error, onLookup, onChange }) {
-    return (
-        <CompactField label="Matrícula IFSP" error={error}>
-            <input
-                value={form.data.enrollment}
-                onChange={(e) => { form.setData('enrollment', e.target.value); onChange(); }}
-                onBlur={onLookup}
-                disabled={disabled}
-            />
-        </CompactField>
-    );
+function ParticipantFields({ form, disabled }) {
+    const localPart = form.data.email.replace(/@aluno\.ifsp\.edu\.br$/i, '');
+    return <><CompactField label="Nome completo" error={form.errors.name}><input value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} disabled={disabled} /></CompactField><CompactField label="Curso" error={form.errors.course}><select value={form.data.course} onChange={(e) => form.setData('course', e.target.value)} disabled={disabled}><option value="">Selecione seu curso</option>{campusCourses.map((course) => <option key={course} value={course}>{course}</option>)}</select></CompactField><CompactField label="E-mail acadêmico" error={form.errors.email}><div className="academic-email"><input value={localPart} onChange={(e) => form.setData('email', `${e.target.value.replace(/@.*/, '')}@aluno.ifsp.edu.br`)} disabled={disabled} autoCapitalize="none" autoComplete="username" /><span>@aluno.ifsp.edu.br</span></div></CompactField></>;
 }
 
 function CompactField({ label, error, children }) {
@@ -311,8 +325,8 @@ function EventHeader() {
             </div>
             <nav className="event-nav" aria-label="Navegação do evento"><a href={route('event.regulation')}>Regulamento</a><a href={route('event.schedule')}>Cronograma</a><a href={route('event.contact')}>Contato</a></nav>
             <div className="institution-logos">
-                <img className="casec-logo" src="/images/logo-casec-jr.png" alt="CASEC Jr." />
-                <img className="ifsp-logo-image" src="/images/logo-ifsp.png" alt="Instituto Federal de São Paulo — Campus Caraguatatuba" />
+                <div className="institution-logo-group"><span>ORGANIZAÇÃO</span><img className="ifsp-logo-image" src="/images/logo-ifsp.png" alt="Técnicas do laboratório do IFSP Campus Caraguatatuba — organização" /></div>
+                <div className="institution-logo-group"><span>APOIO</span><img className="casec-logo" src="/images/logo-casec-jr.png" alt="CASEC Jr. — apoio" /></div>
             </div>
         </header>
     );
@@ -348,7 +362,7 @@ function CompetitionCarousel() {
             onFocus={() => setPaused(true)}
             onBlur={() => setPaused(false)}
             aria-roledescription="carrossel"
-            aria-label="Fotos da Competição de Pontes de Palito de 2023"
+            aria-label="Fotos históricas das competições de pontes"
         >
             <div className="carousel-viewport" aria-live="polite">
                 {competitionPhotos.map((photo, index) => (
@@ -362,9 +376,8 @@ function CompetitionCarousel() {
                 ))}
                 <div className="carousel-shade" />
                 <figcaption>
-                    <span>Competição 2023</span>
+                    <span>{competitionPhotos[activeIndex].edition}</span>
                     <strong>{competitionPhotos[activeIndex].caption}</strong>
-                    <a href="https://www.ifspcaraguatatuba.edu.br/noticias/competicao-de-pontes-de-palito-de-churrasco-2023-agita-o-campus" target="_blank" rel="noreferrer">Fonte: IFSP Caraguatatuba</a>
                 </figcaption>
                 <button type="button" className="carousel-control is-previous" onClick={showPrevious} aria-label="Foto anterior">‹</button>
                 <button type="button" className="carousel-control is-next" onClick={showNext} aria-label="Próxima foto">›</button>

@@ -44,7 +44,7 @@ class DemoCompetitionSeeder extends Seeder
             $enrollment = 'MCK'.str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT);
             $leaderName = ['Ana Souza', 'Bruno Lima', 'Carla Mendes', 'Diego Rocha', 'Elisa Martins', 'Felipe Costa', 'Gabriela Luz', 'Henrique Alves'][$index];
             $course = $definition['quota_type'] === 'civil' ? 'Engenharia Civil' : 'Arquitetura e Urbanismo';
-            CampusStudent::updateOrCreate(['enrollment' => $enrollment], ['name' => $leaderName, 'course' => $course, 'is_active' => true]);
+            CampusStudent::updateOrCreate(['enrollment' => $enrollment], ['name' => $leaderName, 'course' => $course, 'ira' => 8.00, 'is_active' => true]);
             Member::updateOrCreate(['enrollment' => $enrollment], ['team_id' => $team->id, 'name' => $leaderName, 'course' => $course, 'email' => strtolower(str_replace(' ', '.', $leaderName)).'@demo.ifsp.edu.br', 'is_leader' => true]);
         }
 

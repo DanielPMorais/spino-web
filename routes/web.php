@@ -18,7 +18,8 @@ Route::get('/', function () {
 Route::get('/inscricao', [RegistrationController::class, 'create'])->name('registration.create');
 Route::post('/inscricao/equipes', [RegistrationController::class, 'store'])->name('registration.store');
 Route::post('/inscricao/participacoes', [RegistrationController::class, 'join'])->name('registration.join');
-Route::get('/inscricao/alunos/{enrollment}', [RegistrationController::class, 'student'])->name('registration.student');
+Route::post('/inscricao/confirmar-email', [RegistrationController::class, 'verifyEmail'])->middleware('throttle:10,1')->name('registration.verify-email');
+Route::post('/inscricao/reenviar-confirmacao', [RegistrationController::class, 'resendEmailVerification'])->middleware('throttle:3,1')->name('registration.resend-email');
 Route::get('/regulamento', fn () => Inertia::render('Event/Regulation'))->name('event.regulation');
 Route::get('/cronograma', fn () => Inertia::render('Event/Schedule', [
     'registrationStartsAt' => config('competition.registration_starts_at'),

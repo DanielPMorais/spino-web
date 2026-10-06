@@ -45,7 +45,7 @@ class BridgeAuditController extends Controller
             'audit_notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $approved = $data['measured_weight_grams'] <= 1010
+        $approved = $data['measured_weight_grams'] <= 1000
             && $data['materials_compliant']
             && $data['dimensions_compliant']
             && $data['no_coating'];

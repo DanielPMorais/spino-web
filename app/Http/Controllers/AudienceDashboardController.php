@@ -27,7 +27,7 @@ class AudienceDashboardController extends Controller
             $efficiency = (float) ($team->efficiency_score ?? 0);
             $precision = (float) ($team->precision_score ?? 0);
             return [
-                'id' => $team->id, 'name' => $team->name, 'category' => $team->quota_type,
+                'id' => $team->id, 'name' => $team->name,
                 'efficiency' => $efficiency, 'precision' => $precision, 'aesthetic' => $aesthetic,
                 'total' => round($efficiency + $precision + $aesthetic, 2),
                 'actualLoadKg' => $team->actual_load_grams ? round($team->actual_load_grams / 1000, 2) : null,
@@ -49,6 +49,6 @@ class AudienceDashboardController extends Controller
     private function currentTest(?Team $team): ?array
     {
         if (! $team) return null;
-        return ['name' => $team->name, 'category' => $team->quota_type, 'declaredLoadKg' => $team->declared_load_grams ? round($team->declared_load_grams / 1000, 2) : null, 'samples' => $team->loadSamples->sortBy('elapsed_ms')->map(fn ($sample) => ['seconds' => round($sample->elapsed_ms / 1000, 1), 'loadKg' => round($sample->load_grams / 1000, 2)])->values()];
+        return ['name' => $team->name, 'declaredLoadKg' => $team->declared_load_grams ? round($team->declared_load_grams / 1000, 2) : null, 'samples' => $team->loadSamples->sortBy('elapsed_ms')->map(fn ($sample) => ['seconds' => round($sample->elapsed_ms / 1000, 1), 'loadKg' => round($sample->load_grams / 1000, 2)])->values()];
     }
 }
