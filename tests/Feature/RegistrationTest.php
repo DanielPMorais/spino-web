@@ -7,6 +7,7 @@ use App\Models\Team;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -27,6 +28,22 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('registration.create'));
         $this->assertDatabaseHas('teams', ['name' => 'Ponte de Teste', 'status' => 'forming']);
         $this->assertDatabaseHas('members', ['email' => 'lider@aluno.ifsp.edu.br', 'is_leader' => true]);
+    }
+
+    public function test_a_temporary_mail_failure_keeps_the_registration_recoverable(): void
+    {
+        Mail::shouldReceive('raw')->once()->andThrow(new RuntimeException('SMTP indisponível.'));
+
+        $response = $this->post(route('registration.store'), [
+            'team_name' => 'Ponte com Reenvio',
+            'name' => 'Líder de Teste',
+            'course' => 'Bacharelado em Engenharia Civil',
+            'email' => 'reenvio@aluno.ifsp.edu.br',
+        ]);
+
+        $response->assertRedirect(route('registration.create'));
+        $response->assertSessionHas('registration_verification_member_id');
+        $this->assertDatabaseHas('members', ['email' => 'reenvio@aluno.ifsp.edu.br', 'is_leader' => true]);
     }
 
     public function test_a_student_cannot_join_more_than_one_team(): void

@@ -159,7 +159,7 @@ function RegistrationSuccess({ flash, verification, onStartAnother }) {
     const createdTeam = Boolean(flash?.teamCode);
 
     if (verification) {
-        return <EmailVerification email={verification.email} teamCode={flash?.teamCode} onStartAnother={onStartAnother} />;
+        return <EmailVerification email={verification.email} teamCode={flash?.teamCode} message={flash?.success} onStartAnother={onStartAnother} />;
     }
 
     return (
@@ -184,7 +184,7 @@ function RegistrationSuccess({ flash, verification, onStartAnother }) {
     );
 }
 
-function EmailVerification({ email, teamCode, onStartAnother }) {
+function EmailVerification({ email, teamCode, message, onStartAnother }) {
     const form = useForm({ code: '' });
     const resend = useForm({});
 
@@ -210,6 +210,7 @@ function EmailVerification({ email, teamCode, onStartAnother }) {
                         <span>Código enviado para</span>
                         <strong>{email}</strong>
                     </div>
+                    {message && <p className="verification-message">{message}</p>}
                     <CompactField label="Código de confirmação" error={form.errors.code}>
                         <input
                             value={form.data.code}

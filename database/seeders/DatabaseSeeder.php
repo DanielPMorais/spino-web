@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing'])) {
+            return;
+        }
+
         CampusStudent::upsert([
             ['enrollment' => 'CT300001', 'name' => 'Ana Souza', 'course' => 'Engenharia Civil', 'ira' => 8.50, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
             ['enrollment' => 'CT300002', 'name' => 'Bruno Lima', 'course' => 'Engenharia Civil', 'ira' => 7.75, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
