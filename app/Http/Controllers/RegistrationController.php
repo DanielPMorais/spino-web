@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class RegistrationController extends Controller
 {
@@ -58,11 +59,13 @@ class RegistrationController extends Controller
             return ['member' => $member, 'teamCode' => $team->code];
         });
 
-        $this->sendVerificationCode($registration['member']);
         session(['registration_verification_member_id' => $registration['member']->id]);
+        $emailSent = $this->sendVerificationCode($registration['member']);
 
         return to_route('registration.create')->with([
-            'success' => 'Equipe criada. Confirme seu e-mail acadêmico para concluir sua participação.',
+            'success' => $emailSent
+                ? 'Equipe criada. Confirme seu e-mail acadêmico para concluir sua participação.'
+                : 'Equipe criada, mas não foi possível enviar o código agora. Use “Reenviar código” para tentar novamente.',
             'teamCode' => $registration['teamCode'],
             'verificationRequired' => true,
             'verificationEmail' => $registration['member']->email,
@@ -94,11 +97,13 @@ class RegistrationController extends Controller
             return $member;
         });
 
-        $this->sendVerificationCode($member);
         session(['registration_verification_member_id' => $member->id]);
+        $emailSent = $this->sendVerificationCode($member);
 
         return to_route('registration.create')->with([
-            'success' => 'Seu ingresso foi registrado. Confirme seu e-mail acadêmico para concluir sua participação.',
+            'success' => $emailSent
+                ? 'Seu ingresso foi registrado. Confirme seu e-mail acadêmico para concluir sua participação.'
+                : 'Seu ingresso foi registrado, mas não foi possível enviar o código agora. Use “Reenviar código” para tentar novamente.',
             'verificationRequired' => true,
             'verificationEmail' => $member->email,
         ]);
@@ -158,10 +163,12 @@ class RegistrationController extends Controller
             return to_route('registration.create')->with('success', 'Este e-mail acadêmico já foi confirmado.');
         }
 
-        $this->sendVerificationCode($member);
+        $emailSent = $this->sendVerificationCode($member);
 
         return to_route('registration.create')->with([
-            'success' => 'Enviamos um novo código de confirmação.',
+            'success' => $emailSent
+                ? 'Enviamos um novo código de confirmação.'
+                : 'Não foi possível enviar o código agora. Tente novamente em alguns minutos.',
             'verificationRequired' => true,
             'verificationEmail' => $member->email,
         ]);
@@ -198,7 +205,7 @@ class RegistrationController extends Controller
         return ['email' => $member->email];
     }
 
-    private function sendVerificationCode(Member $member): void
+    private function sendVerificationCode(Member $member): bool
     {
         $code = (string) random_int(100000, 999999);
 
@@ -207,22 +214,34 @@ class RegistrationController extends Controller
             'email_verification_expires_at' => now()->addMinutes(15),
         ]);
 
-        Mail::raw(
-            "Olá, {$member->name}!\n\nSeu código para confirmar o e-mail acadêmico na Competição de Pontes de Palito 2026 é: {$code}\n\nO código expira em 15 minutos. Se você não iniciou esta inscrição, ignore esta mensagem.",
-            function ($message) use ($member): void {
-                $message->to($member->email)->subject('Código de confirmação — Competição de Pontes de Palito 2026');
-            },
-        );
+        try {
+            Mail::raw(
+                "Olá, {$member->name}!\n\nSeu código para confirmar o e-mail acadêmico na Competição de Pontes de Palito 2026 é: {$code}\n\nO código expira em 15 minutos. Se você não iniciou esta inscrição, ignore esta mensagem.",
+                function ($message) use ($member): void {
+                    $message->to($member->email)->subject('Código de confirmação — Competição de Pontes de Palito 2026');
+                },
+            );
+
+            return true;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
     }
 
     private function sendTeamCode(Member $member, string $teamCode): void
     {
-        Mail::raw(
-            "Olá, {$member->name}!\n\nSeu e-mail acadêmico foi confirmado e sua equipe foi criada.\n\nCódigo da equipe: {$teamCode}\n\nCompartilhe este código com os demais integrantes para que eles possam entrar na equipe e confirmar seus próprios e-mails.",
-            function ($message) use ($member): void {
-                $message->to($member->email)->subject('Código da equipe — Competição de Pontes de Palito 2026');
-            },
-        );
+        try {
+            Mail::raw(
+                "Olá, {$member->name}!\n\nSeu e-mail acadêmico foi confirmado e sua equipe foi criada.\n\nCódigo da equipe: {$teamCode}\n\nCompartilhe este código com os demais integrantes para que eles possam entrar na equipe e confirmar seus próprios e-mails.",
+                function ($message) use ($member): void {
+                    $message->to($member->email)->subject('Código da equipe — Competição de Pontes de Palito 2026');
+                },
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
     private function availability(): array

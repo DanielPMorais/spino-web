@@ -47,6 +47,7 @@ button, input, select { font: inherit; }
 .success-code button { margin-top: 10px; border: 0; border-radius: 7px; padding: 10px 20px; color: #fff; background: #ff7900; font-size: 11px; font-weight: 800; cursor: pointer; }
 .verification-copy { display: grid; gap: 5px; padding: 16px; border-radius: 9px; color: #345143; background: #eef5f0; font-size: 12px; text-align: center; }
 .verification-copy strong { color: #17382b; font-size: 14px; overflow-wrap: anywhere; }
+.verification-message { margin: -2px 0 0; color: #52675a; font-size: 11px; line-height: 1.5; text-align: center; }
 .verification-team-code { margin-top: 20px !important; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.2); }
 .verification-team-code strong { display: block; margin-top: 7px; color: #efad65; font-size: 18px; letter-spacing: .12em; }
 .resend-code-button, .cancel-verification-button { border: 0; color: #315241; background: transparent; font-size: 11px; font-weight: 800; cursor: pointer; }
