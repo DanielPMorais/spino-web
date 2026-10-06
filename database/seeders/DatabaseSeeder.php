@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         CampusStudent::upsert([
-            ['enrollment' => 'CT300001', 'name' => 'Ana Souza', 'course' => 'Engenharia Civil', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['enrollment' => 'CT300002', 'name' => 'Bruno Lima', 'course' => 'Engenharia Civil', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['enrollment' => 'CT300003', 'name' => 'Carla Mendes', 'course' => 'Tecnologia em Processos Gerenciais', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-        ], ['enrollment'], ['name', 'course', 'is_active', 'updated_at']);
+            ['enrollment' => 'CT300001', 'name' => 'Ana Souza', 'course' => 'Engenharia Civil', 'ira' => 8.50, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['enrollment' => 'CT300002', 'name' => 'Bruno Lima', 'course' => 'Engenharia Civil', 'ira' => 7.75, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['enrollment' => 'CT300003', 'name' => 'Carla Mendes', 'course' => 'Tecnologia em Processos Gerenciais', 'ira' => 8.00, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ], ['enrollment'], ['name', 'course', 'ira', 'is_active', 'updated_at']);
 
         // User::factory(10)->create();
 

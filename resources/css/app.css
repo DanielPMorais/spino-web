@@ -12,7 +12,13 @@ button, input, select { font: inherit; }
 .event-brand, .institution-logos { display: flex; align-items: center; }
 .event-brand { gap: 14px; font-size: 14px; }
 .event-brand img { width: 48px; height: 38px; object-fit: contain; }
-.institution-logos { gap: 42px; }
+.academic-email { display: flex; align-items: center; overflow: hidden; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
+.academic-email input { min-width: 0; flex: 1; border: 0; box-shadow: none; }
+.academic-email input:focus { border: 0; box-shadow: none; }
+.academic-email span { padding-right: 11px; color: #475569; font-size: 13px; white-space: nowrap; }
+.institution-logos { gap: 24px; }
+.institution-logo-group { display: grid; justify-items: center; gap: 2px; }
+.institution-logo-group > span { color: #ffbf7c; font-size: 8px; font-weight: 800; letter-spacing: .12em; line-height: 1; }
 .casec-logo { width: 102px; height: 38px; object-fit: contain; }
 .ifsp-logo-image { width: 112px; height: 40px; object-fit: contain; }
 
@@ -39,6 +45,14 @@ button, input, select { font: inherit; }
 .success-code strong { padding: 11px 24px; border-radius: 8px; color: #fff; background: #192d3c; font-size: 28px; letter-spacing: .16em; }
 .success-code p { margin: 0; font-size: 12px; }
 .success-code button { margin-top: 10px; border: 0; border-radius: 7px; padding: 10px 20px; color: #fff; background: #ff7900; font-size: 11px; font-weight: 800; cursor: pointer; }
+.verification-copy { display: grid; gap: 5px; padding: 16px; border-radius: 9px; color: #345143; background: #eef5f0; font-size: 12px; text-align: center; }
+.verification-copy strong { color: #17382b; font-size: 14px; overflow-wrap: anywhere; }
+.verification-team-code { margin-top: 20px !important; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.2); }
+.verification-team-code strong { display: block; margin-top: 7px; color: #efad65; font-size: 18px; letter-spacing: .12em; }
+.resend-code-button, .cancel-verification-button { border: 0; color: #315241; background: transparent; font-size: 11px; font-weight: 800; cursor: pointer; }
+.resend-code-button { margin-top: 2px; }
+.cancel-verification-button { color: #6b7a72; font-weight: 700; }
+.resend-code-button:disabled { cursor: wait; opacity: .6; }
 
 .form-card { width: min(620px, 100%); padding: 22px 28px 16px; }
 .form-heading { min-height: 62px; display: grid; grid-template-columns: 58px 1fr 38px; align-items: center; }
@@ -66,6 +80,7 @@ button, input, select { font: inherit; }
     .event-brand { gap: 7px; font-size: 10px; }
     .event-brand img { width: 38px; height: 30px; }
     .institution-logos { gap: 10px; }
+    .institution-logo-group > span { font-size: 6px; }
     .casec-logo { width: 70px; }
     .ifsp-logo-image { width: 76px; }
     .registration-stage { padding: 22px 14px; overflow: auto; }
@@ -292,7 +307,7 @@ button, input, select { font: inherit; }
     .event-brand strong { font-size: 11px; }
     .event-brand small { font-size: 8px; }
     .institution-logos { gap: 8px; padding-left: 10px; }
-    .casec-logo { display: none; }
+    .institution-logo-group:last-child { display: none; }
     .ifsp-logo-image { width: 74px; }
     .institutional-hero { gap: 24px; padding: 44px 22px 58px; }
     .hero-copy h1 { font-size: 42px; }

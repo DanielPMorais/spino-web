@@ -20,10 +20,6 @@ function formatSeconds(value) {
     return isNumeric(value) ? `${formatNumber(value)} s` : '—';
 }
 
-function categoryLabel(category) {
-    return category === 'civil' ? 'Engenharia Civil' : 'Ampla concorrência';
-}
-
 function voteLabel(count) {
     const votes = Number(count) || 0;
     return `${votes} ${votes === 1 ? 'voto' : 'votos'} de estética`;
@@ -118,7 +114,7 @@ function CurrentTest({ test }) {
     return <div className="current-test">
         <article className="current-test-card">
             <span className="test-pulse" aria-hidden="true" />
-            <div className="current-test-identity"><small>Agora no ensaio</small><strong title={test.name}>{test.name}</strong><span>Categoria · {categoryLabel(test.category)}</span></div>
+            <div className="current-test-identity"><small>Agora no ensaio</small><strong title={test.name}>{test.name}</strong><span>Competição de Pontes de Palito 2026</span></div>
             <p><small>Carga declarada</small><b>{formatKg(test.declaredLoadKg)}</b></p>
         </article>
         <RuptureChart samples={test.samples} declaredLoad={test.declaredLoadKg} title="Carga ao vivo" compact />
@@ -134,7 +130,7 @@ function RankingCard({ team, displayPosition, metric, expanded, onToggle }) {
     return <article className={`ranking-card ${podium ? `is-podium is-position-${displayPosition}` : ''} ${expanded ? 'is-expanded' : ''}`}>
         <div className="ranking-card-main">
             <span className="ranking-position">{displayPosition}<sup>º</sup></span>
-            <div className="ranking-team">{podium && <span className="podium-label">{displayPosition === 1 ? 'Liderança' : 'Pódio'}</span>}<h3 title={team.name}>{team.name}</h3><p>{categoryLabel(team.category)}</p></div>
+            <div className="ranking-team">{podium && <span className="podium-label">{displayPosition === 1 ? 'Liderança' : 'Pódio'}</span>}<h3 title={team.name}>{team.name}</h3><p>Equipe inscrita</p></div>
             <div className="ranking-score"><strong>{formatNumber(team[metric])}</strong><span>{metric === 'total' ? 'pontos' : tabs[metric]}</span></div>
         </div>
         <button type="button" onClick={onToggle} className="details-button" aria-expanded={expanded} aria-controls={panelId}>

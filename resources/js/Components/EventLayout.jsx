@@ -19,8 +19,8 @@ export default function EventLayout({ active, children }) {
                     {navigation.map((item) => <Link key={item.route} className={active === item.route ? 'is-active' : ''} href={route(item.route)}>{item.label}</Link>)}
                 </nav>
                 <div className="institution-logos">
-                    <img className="casec-logo" src="/images/logo-casec-jr.png" alt="CASEC Jr." />
-                    <img className="ifsp-logo-image" src="/images/logo-ifsp.png" alt="IFSP Campus Caraguatatuba" />
+                    <div className="institution-logo-group"><span>ORGANIZAÇÃO</span><img className="ifsp-logo-image" src="/images/logo-ifsp.png" alt="Técnicas do laboratório do IFSP Campus Caraguatatuba — organização" /></div>
+                    <div className="institution-logo-group"><span>APOIO</span><img className="casec-logo" src="/images/logo-casec-jr.png" alt="CASEC Jr. — apoio" /></div>
                 </div>
             </header>
             {children}

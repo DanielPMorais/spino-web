@@ -23,9 +23,8 @@ export default function RegistrationIndex({ teams, metrics }) {
     const actions = <button type="button" onClick={() => window.print()} className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">↓ Exportar lista</button>;
 
     return <AdminLayout title="Gestão de inscrições" description="Acompanhe, valide e administre as equipes inscritas." actions={actions}><Head title="Administração — Inscrições" />
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumo das inscrições">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Resumo das inscrições">
             <MetricCard label="Equipes inscritas" value={`${metrics.total} / ${metrics.totalLimit}`} detail="Limite máximo de equipes" accent="bg-sky-600" />
-            <MetricCard label="Cota Eng. Civil" value={`${metrics.civil} / ${metrics.civilLimit}`} detail="Vagas reservadas ocupadas" accent="bg-emerald-600" />
             <MetricCard label="Aguardando análise" value={metrics.pending} detail="Equipes que exigem validação" accent="bg-amber-600" />
             <MetricCard label="Inscrições aprovadas" value={metrics.approved} detail={`${metrics.total ? Math.round((metrics.approved / metrics.total) * 100) : 0}% das equipes ativas`} accent="bg-emerald-600" />
         </section>

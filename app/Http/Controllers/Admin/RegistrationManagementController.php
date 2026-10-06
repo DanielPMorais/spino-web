@@ -23,20 +23,15 @@ class RegistrationManagementController extends Controller
                 'name' => $team->name,
                 'leader' => $team->members->first()?->name ?? 'Líder não informado',
                 'course' => $team->members->first()?->course ?? '—',
-                'quotaType' => $team->quota_type,
                 'status' => $team->status,
             ]);
 
         $activeTeams = $teams->where('status', '!=', 'rejected');
-        $civilTeams = $activeTeams->where('quotaType', 'civil');
-
         return Inertia::render('Admin/Registrations/Index', [
             'teams' => $teams->values(),
             'metrics' => [
                 'total' => $activeTeams->count(),
                 'totalLimit' => config('competition.max_teams'),
-                'civil' => $civilTeams->count(),
-                'civilLimit' => config('competition.civil_engineering_quota'),
                 'pending' => $teams->where('status', 'pending')->count(),
                 'approved' => $teams->where('status', 'approved')->count(),
             ],

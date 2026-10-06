@@ -51,7 +51,7 @@ export default function AdminLayout({ title, description, children, actions = nu
 
                 <main className="mx-auto max-w-[1440px] px-5 py-7 sm:px-8 sm:py-9">
                     <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                        <div><p className="text-xs font-bold uppercase tracking-[.14em] text-sky-700">CASEC Jr. · Concurso de Pontes</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{title}</h1>{description && <p className="mt-2 max-w-2xl text-slate-500">{description}</p>}</div>
+                        <div><p className="text-xs font-bold uppercase tracking-[.14em] text-sky-700">IFSP · Organização do Concurso de Pontes</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{title}</h1>{description && <p className="mt-2 max-w-2xl text-slate-500">{description}</p>}</div>
                         {actions && <div className="flex shrink-0 flex-wrap gap-3">{actions}</div>}
                     </div>
                     {children}
@@ -62,7 +62,7 @@ export default function AdminLayout({ title, description, children, actions = nu
 }
 
 function AdminBrand() {
-    return <Link href={route('admin.dashboard')} className="flex h-20 items-center gap-3 px-6"><span className="grid size-10 place-items-center rounded-xl bg-orange-500 font-black text-white">C</span><span><strong className="block text-lg">CASEC Jr.</strong><small className="text-slate-400">Central do evento</small></span></Link>;
+    return <Link href={route('admin.dashboard')} className="flex h-20 items-center gap-3 px-6"><span className="grid size-10 place-items-center rounded-xl bg-emerald-700 font-black text-white">I</span><span><strong className="block text-lg">IFSP</strong><small className="text-slate-400">Comissão organizadora</small></span></Link>;
 }
 
 function AdminNavigation({ onNavigate }) {
