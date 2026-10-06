@@ -37,7 +37,7 @@ class RegistrationController extends Controller
 
             // PostgreSQL does not allow FOR UPDATE on aggregate queries such as count().
             // The registration checks below use aggregate queries, so keep this query unlocked.
-            $activeTeams = Team::query()->whereNot('status', 'rejected');
+            $activeTeams = Team::query()->whereIn('status', ['pending', 'approved']);
             if ($activeTeams->count() >= config('competition.max_teams')) {
                 throw ValidationException::withMessages(['team_name' => 'Todas as vagas do concurso foram preenchidas.']);
             }
@@ -56,7 +56,7 @@ class RegistrationController extends Controller
                 'is_leader' => true,
             ]);
 
-            return ['member' => $member, 'teamCode' => $team->code];
+            return ['member' => $member];
         });
 
         session(['registration_verification_member_id' => $registration['member']->id]);
@@ -66,7 +66,6 @@ class RegistrationController extends Controller
             'success' => $emailSent
                 ? 'Equipe criada. Confirme seu e-mail acadêmico para concluir sua participação.'
                 : 'Equipe criada, mas não foi possível enviar o código agora. Use “Reenviar código” para tentar novamente.',
-            'teamCode' => $registration['teamCode'],
             'verificationRequired' => true,
             'verificationEmail' => $registration['member']->email,
         ]);
@@ -246,8 +245,9 @@ class RegistrationController extends Controller
 
     private function availability(): array
     {
-        $teams = Team::whereNot('status', 'rejected');
+        $teams = Team::whereIn('status', ['pending', 'approved']);
         $total = (clone $teams)->count();
+
         return [
             'isOpen' => $this->isRegistrationOpen(),
             'totalRemaining' => max(0, config('competition.max_teams') - $total),

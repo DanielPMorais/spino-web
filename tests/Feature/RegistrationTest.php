@@ -28,6 +28,7 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('registration.create'));
         $this->assertDatabaseHas('teams', ['name' => 'Ponte de Teste', 'status' => 'forming']);
         $this->assertDatabaseHas('members', ['email' => 'lider@aluno.ifsp.edu.br', 'is_leader' => true]);
+        $response->assertSessionMissing('teamCode');
     }
 
     public function test_a_temporary_mail_failure_keeps_the_registration_recoverable(): void
@@ -104,6 +105,18 @@ class RegistrationTest extends TestCase
 
         $this->assertNotNull($member->refresh()->email_verified_at);
         $this->assertDatabaseHas('teams', ['id' => $team->id, 'status' => 'pending']);
+    }
+
+    public function test_unconfirmed_drafts_do_not_consume_a_registration_vacancy(): void
+    {
+        Team::create(['name' => 'Rascunho', 'code' => 'RASC0003', 'category' => 'general', 'quota_type' => 'general', 'status' => 'forming']);
+        Team::create(['name' => 'Inscrita', 'code' => 'PEND0002', 'category' => 'general', 'quota_type' => 'general', 'status' => 'pending']);
+
+        $this->get(route('registration.create'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Registration/Create')
+                ->where('availability.totalRemaining', config('competition.max_teams') - 1));
     }
 
     public function test_a_leader_receives_the_team_code_after_confirming_the_email(): void
