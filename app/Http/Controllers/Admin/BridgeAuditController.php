@@ -13,7 +13,7 @@ class BridgeAuditController extends Controller
 {
     public function index(): Response
     {
-        $teams = Team::query()->with(['members' => fn ($query) => $query->where('is_leader', true)])->where('status', '!=', 'rejected')->latest()->get()->map(fn (Team $team) => $this->teamData($team));
+        $teams = Team::query()->with(['members' => fn ($query) => $query->where('is_leader', true)])->whereNotIn('status', ['forming', 'rejected'])->latest()->get()->map(fn (Team $team) => $this->teamData($team));
 
         return Inertia::render('Admin/BridgeAudits/Index', [
             'teams' => $teams->values(),
@@ -29,13 +29,15 @@ class BridgeAuditController extends Controller
     public function show(Team $team): Response
     {
         $team->load(['members' => fn ($query) => $query->where('is_leader', true)]);
-        abort_if($team->status === 'rejected', 404);
+        abort_if(in_array($team->status, ['forming', 'rejected'], true), 404);
 
         return Inertia::render('Admin/BridgeAudits/Show', ['team' => $this->teamData($team)]);
     }
 
     public function store(Request $request, Team $team): RedirectResponse
     {
+        abort_if(in_array($team->status, ['forming', 'rejected'], true), 404);
+
         $data = $request->validate([
             'measured_weight_grams' => ['required', 'integer', 'min:1'],
             'declared_load_grams' => ['required', 'integer', 'min:1'],

@@ -14,6 +14,7 @@ class RegistrationManagementController extends Controller
     public function index(): Response
     {
         $teams = Team::query()
+            ->whereNot('status', 'forming')
             ->with(['members' => fn ($query) => $query->where('is_leader', true)])
             ->latest()
             ->get()
@@ -27,6 +28,7 @@ class RegistrationManagementController extends Controller
             ]);
 
         $activeTeams = $teams->where('status', '!=', 'rejected');
+
         return Inertia::render('Admin/Registrations/Index', [
             'teams' => $teams->values(),
             'metrics' => [
@@ -40,8 +42,10 @@ class RegistrationManagementController extends Controller
 
     public function updateStatus(Request $request, Team $team): RedirectResponse
     {
+        abort_if($team->status === 'forming', 404);
+
         $validated = $request->validate([
-            'status' => ['required', 'in:forming,pending,approved,rejected'],
+            'status' => ['required', 'in:pending,approved,rejected'],
         ]);
 
         $team->update($validated);

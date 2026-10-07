@@ -159,7 +159,7 @@ function RegistrationSuccess({ flash, verification, onStartAnother }) {
     const createdTeam = Boolean(flash?.teamCode);
 
     if (verification) {
-        return <EmailVerification email={verification.email} teamCode={flash?.teamCode} message={flash?.success} onStartAnother={onStartAnother} />;
+        return <EmailVerification email={verification.email} message={flash?.success} onStartAnother={onStartAnother} />;
     }
 
     return (
@@ -184,7 +184,7 @@ function RegistrationSuccess({ flash, verification, onStartAnother }) {
     );
 }
 
-function EmailVerification({ email, teamCode, message, onStartAnother }) {
+function EmailVerification({ email, message, onStartAnother }) {
     const form = useForm({ code: '' });
     const resend = useForm({});
 
@@ -199,7 +199,6 @@ function EmailVerification({ email, teamCode, message, onStartAnother }) {
                 <span className="eyebrow">Confirmação necessária</span>
                 <h2>Verifique seu e-mail</h2>
                 <p>Enviamos um código de seis dígitos para seu e-mail acadêmico. A participação seguirá para análise após a confirmação.</p>
-                {teamCode && <p className="verification-team-code">Código da equipe: <strong>{teamCode}</strong></p>}
             </aside>
             <section className="form-card">
                 <div className="form-progress" aria-label="Etapa 3 de 3">

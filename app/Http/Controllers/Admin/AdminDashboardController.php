@@ -14,9 +14,9 @@ class AdminDashboardController extends Controller
     public function index(): Response
     {
         $teams = Team::query();
-        $activeTeams = (clone $teams)->where('status', '!=', 'rejected');
+        $activeTeams = (clone $teams)->whereIn('status', ['pending', 'approved']);
         $pendingRegistrations = (clone $teams)->where('status', 'pending')->count();
-        $waitingAudits = (clone $teams)->where('status', '!=', 'rejected')->where('audit_status', 'waiting')->count();
+        $waitingAudits = (clone $teams)->whereIn('status', ['pending', 'approved'])->where('audit_status', 'waiting')->count();
         $approvedAudits = (clone $teams)->where('audit_status', 'approved')->count();
         $judges = Judge::query();
         $completedVotes = (clone $judges)->where('vote_status', 'completed')->count();
