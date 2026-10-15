@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\BridgeAuditController;
 use App\Http\Controllers\Admin\JudgeManagementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\ManualRuptureResultController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -44,6 +45,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/organizacao', [BridgeAuditController::class, 'index'])->name('admin.bridge-audits.index');
         Route::get('/admin/organizacao/{team}', [BridgeAuditController::class, 'show'])->name('admin.bridge-audits.show');
         Route::post('/admin/organizacao/{team}', [BridgeAuditController::class, 'store'])->name('admin.bridge-audits.store');
+        Route::get('/admin/resultados/ruptura', [ManualRuptureResultController::class, 'index'])->name('admin.manual-rupture-results.index');
+        Route::post('/admin/resultados/ruptura/{team}', [ManualRuptureResultController::class, 'store'])->name('admin.manual-rupture-results.store');
         Route::get('/admin/juizes', [JudgeManagementController::class, 'index'])->name('admin.judges.index');
         Route::post('/admin/juizes', [JudgeManagementController::class, 'store'])->name('admin.judges.store');
         Route::patch('/admin/juizes/janela-votacao', [JudgeManagementController::class, 'toggleVoting'])->name('admin.judges.toggle-voting');
