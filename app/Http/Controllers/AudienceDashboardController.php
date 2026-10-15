@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\JudgeVote;
 use App\Models\Team;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,11 +25,17 @@ class AudienceDashboardController extends Controller
             $aesthetic = $judgeCount ? round(($aestheticTotals[$team->id] ?? 0) / $judgeCount, 2) : 0;
             $efficiency = (float) ($team->efficiency_score ?? 0);
             $precision = (float) ($team->precision_score ?? 0);
+            // A telemetria é a fonte preferencial; o registro manual mantém o placar disponível em contingência.
+            $ruptureLoadGrams = $team->actual_load_grams ?? $team->manual_rupture_load_grams;
+
             return [
-                'id' => $team->id, 'name' => $team->name,
-                'efficiency' => $efficiency, 'precision' => $precision, 'aesthetic' => $aesthetic,
+                'id' => $team->id,
+                'name' => $team->name,
+                'efficiency' => $efficiency,
+                'precision' => $precision,
+                'aesthetic' => $aesthetic,
                 'total' => round($efficiency + $precision + $aesthetic, 2),
-                'actualLoadKg' => $team->actual_load_grams ? round($team->actual_load_grams / 1000, 2) : null,
+                'actualLoadKg' => $ruptureLoadGrams !== null ? round($ruptureLoadGrams / 1000, 2) : null,
                 'declaredLoadKg' => $team->declared_load_grams ? round($team->declared_load_grams / 1000, 2) : null,
                 'members' => $team->members->map(fn ($member) => ['name' => $member->name, 'course' => $member->course])->values(),
                 'ruptureSamples' => $team->loadSamples->sortBy('elapsed_ms')->map(fn ($sample) => [
@@ -43,12 +48,24 @@ class AudienceDashboardController extends Controller
 
         $current = Team::where('test_status', 'running')->with('loadSamples')->first();
 
-        return Inertia::render('Public/Dashboard', ['ranking' => $ranking, 'currentTest' => $this->currentTest($current), 'completedJudges' => $judgeCount]);
+        return Inertia::render('Public/Dashboard', [
+            'ranking' => $ranking,
+            'currentTest' => $this->currentTest($current),
+            'completedJudges' => $judgeCount,
+        ]);
     }
 
     private function currentTest(?Team $team): ?array
     {
         if (! $team) return null;
-        return ['name' => $team->name, 'declaredLoadKg' => $team->declared_load_grams ? round($team->declared_load_grams / 1000, 2) : null, 'samples' => $team->loadSamples->sortBy('elapsed_ms')->map(fn ($sample) => ['seconds' => round($sample->elapsed_ms / 1000, 1), 'loadKg' => round($sample->load_grams / 1000, 2)])->values()];
+
+        return [
+            'name' => $team->name,
+            'declaredLoadKg' => $team->declared_load_grams ? round($team->declared_load_grams / 1000, 2) : null,
+            'samples' => $team->loadSamples->sortBy('elapsed_ms')->map(fn ($sample) => [
+                'seconds' => round($sample->elapsed_ms / 1000, 1),
+                'loadKg' => round($sample->load_grams / 1000, 2),
+            ])->values(),
+        ];
     }
 }
