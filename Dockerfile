@@ -19,8 +19,8 @@ FROM php:8.4-apache
 WORKDIR /var/www/html
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libonig-dev libzip-dev \
-    && docker-php-ext-install pdo_pgsql pgsql mbstring bcmath zip \
+    && apt-get install -y --no-install-recommends libonig-dev libzip-dev \
+    && docker-php-ext-install pdo_sqlite mbstring bcmath zip \
     && a2enmod rewrite \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && rm -rf /var/lib/apt/lists/*
@@ -29,12 +29,13 @@ COPY . .
 COPY --from=dependencies /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-RUN chown -R www-data:www-data storage bootstrap/cache \
+RUN mkdir -p storage/app \
+    && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache
 
 EXPOSE 80
 
-# Schema migrations are idempotent. Set CLEAR_TEST_DATA_ON_DEPLOY=true for one
-# explicitly authorized deploy to remove test data before migrating. Set
-# BOOTSTRAP_ADMIN_ON_DEPLOY=true once to create the first administrator.
-CMD ["sh", "-c", "if [ \"$CLEAR_TEST_DATA_ON_DEPLOY\" = \"true\" ]; then php artisan competition:clear-test-data --force; fi && php artisan migrate --force && if [ \"$BOOTSTRAP_ADMIN_ON_DEPLOY\" = \"true\" ]; then php artisan competition:bootstrap-admin --force; fi && apache2-foreground"]
+# The SQLite file lives in storage/app, which is mounted as persistent data by
+# docker-compose.yml. Migrations are idempotent; keep a single app replica
+# when using SQLite.
+CMD ["sh", "-c", "set -eu; mkdir -p storage/app; touch storage/app/spino.sqlite; chown -R www-data:www-data storage/app storage/logs bootstrap/cache; if [ \"$CLEAR_TEST_DATA_ON_DEPLOY\" = \"true\" ]; then php artisan competition:clear-test-data --force; fi; php artisan migrate --force; if [ \"$BOOTSTRAP_ADMIN_ON_DEPLOY\" = \"true\" ]; then php artisan competition:bootstrap-admin --force; fi; exec apache2-foreground"]
