@@ -1,11 +1,16 @@
 services:
     app:
-        image: painelcti/app84
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                USER_UID: '${DOCKER_USER_UID:-1000}'
+                USER_GID: '${DOCKER_USER_GID:-1000}'
+        image: spino-web/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
             - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             USER_UID: '${DOCKER_USER_UID:-1000}'
             LARAVEL_SAIL: 1
