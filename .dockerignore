@@ -4,4 +4,5 @@
 node_modules
 vendor
 storage/logs
+data
 phpunit.result.cache

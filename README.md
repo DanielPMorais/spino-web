@@ -4,11 +4,12 @@ Aplicação web do Módulo 3 do Projeto Spino, voltada à operação do Concurso
 
 ## Tecnologias
 
-- PHP 8.3 e Laravel 13;
+- PHP 8.3+ e Laravel 13;
 - React 18 com Inertia.js;
 - Tailwind CSS e Vite;
-- MySQL ou PostgreSQL;
-- Laravel Sanctum, Breeze e Ziggy.
+- SQLite;
+- Laravel Sanctum, Breeze e Ziggy;
+- Docker e Docker Compose para implantação.
 
 ## Funcionalidades
 
@@ -36,7 +37,7 @@ Aplicação web do Módulo 3 do Projeto Spino, voltada à operação do Concurso
 - PHP 8.3 ou superior;
 - Composer;
 - Node.js e npm;
-- MySQL ou PostgreSQL.
+- Extensão SQLite do PHP.
 
 ### Configuração
 
@@ -48,15 +49,22 @@ Aplicação web do Módulo 3 do Projeto Spino, voltada à operação do Concurso
    npm install
    ```
 
-3. Crie o arquivo de ambiente e gere a chave da aplicação:
+3. Crie o banco SQLite, o arquivo de ambiente e a chave da aplicação:
 
    ```bash
+   touch database/database.sqlite
    cp .env.example .env
    php artisan key:generate
    ```
 
-4. Configure no `.env` a conexão com o banco de dados e, para a confirmação de e-mail, as credenciais de envio de e-mail.
-5. Execute as migrations e dados de homologação:
+4. No `.env`, use o caminho local do SQLite:
+
+   ```env
+   DB_CONNECTION=sqlite
+   DB_DATABASE=/caminho/absoluto/para/spino-web/database/database.sqlite
+   ```
+
+5. Configure as credenciais SMTP para a confirmação de e-mail e execute as migrations:
 
    ```bash
    php artisan migrate --seed
@@ -71,8 +79,45 @@ Aplicação web do Módulo 3 do Projeto Spino, voltada à operação do Concurso
 
 A aplicação estará disponível em `http://127.0.0.1:8000`.
 
-## Próximos passos
+## Implantação com Docker Compose
 
-- Receber telemetria diretamente dos módulos físicos do Spino;
-- Publicar atualizações do ensaio em tempo real;
-- Consolidar histórico de eventos, medições e resultados para consulta posterior.
+O ambiente de produção usa apenas o serviço `app`. O arquivo SQLite fica em `./data/spino.sqlite` no servidor e não é incluído na imagem nem versionado no Git.
+
+1. No servidor, clone o repositório e crie o arquivo de ambiente:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Ajuste o `.env` para produção. No mínimo:
+
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://seu-dominio
+   DB_CONNECTION=sqlite
+   DB_DATABASE=/var/www/html/storage/app/spino.sqlite
+   MAIL_MAILER=smtp
+   MAIL_HOST=servidor-smtp
+   MAIL_PORT=587
+   MAIL_USERNAME=usuario
+   MAIL_PASSWORD=senha-ou-app-password
+   MAIL_FROM_ADDRESS=remetente@dominio
+   SENSORS_API_TOKEN=gere-um-token-longo-e-aleatorio
+   ```
+
+   Gere uma chave e copie o resultado para `APP_KEY`:
+
+   ```bash
+   docker compose run --rm app php artisan key:generate --show
+   ```
+
+3. Suba a aplicação:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+Por padrão, o Compose publica a aplicação somente em `127.0.0.1:8080`; o servidor deve encaminhar o domínio por um proxy reverso com HTTPS. Caso o proxy use outra porta, altere `SPINO_HTTP_PORT`. Não exponha o SQLite na rede e mantenha somente uma réplica da aplicação.
+
+Faça backup regular de `data/spino.sqlite` no próprio servidor. SQLite atende bem ao volume deste evento, mas não deve ser colocado em diretório compartilhado de rede nem usado por múltiplos containers da aplicação.
