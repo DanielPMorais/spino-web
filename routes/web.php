@@ -7,6 +7,7 @@ use App\Http\Controllers\AudienceDashboardController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\BridgeAuditController;
 use App\Http\Controllers\Admin\JudgeManagementController;
+use App\Http\Controllers\Admin\OrganizerManagementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ManualRuptureResultController;
 use App\Http\Controllers\Admin\TestRunController;
@@ -56,7 +57,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/juizes', [JudgeManagementController::class, 'index'])->name('admin.judges.index');
         Route::post('/admin/juizes', [JudgeManagementController::class, 'store'])->name('admin.judges.store');
         Route::patch('/admin/juizes/janela-votacao', [JudgeManagementController::class, 'toggleVoting'])->name('admin.judges.toggle-voting');
+
+        Route::middleware('can:manage-users')->group(function () {
+            Route::get('/admin/organizadores', [OrganizerManagementController::class, 'index'])->name('admin.organizers.index');
+            Route::post('/admin/organizadores', [OrganizerManagementController::class, 'store'])->name('admin.organizers.store');
+        });
     });
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
