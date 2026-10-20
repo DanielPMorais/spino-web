@@ -8,6 +8,7 @@ const navigation = [
     { label: 'Ensaios', routeName: 'admin.test-runs.index', active: 'admin.test-runs.*', icon: 'test' },
     { label: 'Rupturas', routeName: 'admin.manual-rupture-results.index', active: 'admin.manual-rupture-results.*', icon: 'rupture' },
     { label: 'Juízes', routeName: 'admin.judges.index', active: 'admin.judges.*', icon: 'judges' },
+    { label: 'Organizadores', routeName: 'admin.organizers.index', active: 'admin.organizers.*', icon: 'teams', requiresUserManagement: true },
 ];
 
 export default function AdminLayout({ title, description, children, actions = null }) {
@@ -68,7 +69,8 @@ function AdminBrand() {
 }
 
 function AdminNavigation({ onNavigate }) {
-    return <nav className="grid gap-1 px-3 py-5" aria-label="Navegação administrativa">{navigation.map((item) => {
+    const { auth } = usePage().props;
+    return <nav className="grid gap-1 px-3 py-5" aria-label="Navegação administrativa">{navigation.filter((item) => !item.requiresUserManagement || auth.canManageUsers).map((item) => {
         const active = route().current(item.active);
         return <Link key={item.routeName} href={route(item.routeName)} onClick={onNavigate} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${active ? 'bg-white text-[#172938] shadow' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}><AdminIcon name={item.icon} />{item.label}</Link>;
     })}</nav>;
