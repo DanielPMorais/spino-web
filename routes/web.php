@@ -45,6 +45,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/organizacao', [BridgeAuditController::class, 'index'])->name('admin.bridge-audits.index');
         Route::get('/admin/organizacao/{team}', [BridgeAuditController::class, 'show'])->name('admin.bridge-audits.show');
         Route::post('/admin/organizacao/{team}', [BridgeAuditController::class, 'store'])->name('admin.bridge-audits.store');
+        Route::get('/admin/ensaios', [TestRunController::class, 'index'])->name('admin.test-runs.index');
+        Route::post('/admin/ensaios', [TestRunController::class, 'store'])->name('admin.test-runs.store');
+        Route::post('/admin/ensaios/{testRun}/iniciar', [TestRunController::class, 'start'])->name('admin.test-runs.start');
+        Route::post('/admin/ensaios/{testRun}/finalizar', [TestRunController::class, 'finish'])->name('admin.test-runs.finish');
+        Route::post('/admin/ensaios/{testRun}/cancelar', [TestRunController::class, 'cancel'])->name('admin.test-runs.cancel');
         Route::get('/admin/resultados/ruptura', [ManualRuptureResultController::class, 'index'])->name('admin.manual-rupture-results.index');
         Route::post('/admin/resultados/ruptura/{team}', [ManualRuptureResultController::class, 'store'])->name('admin.manual-rupture-results.store');
         Route::get('/admin/juizes', [JudgeManagementController::class, 'index'])->name('admin.judges.index');
