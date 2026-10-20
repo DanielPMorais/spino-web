@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class BridgeLoadSample extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['team_id', 'elapsed_ms', 'load_grams'];
-    public function team(): BelongsTo { return $this->belongsTo(Team::class); }
+
+    protected $fillable = ['team_id', 'test_run_id', 'sequence', 'elapsed_ms', 'load_grams'];
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function testRun(): BelongsTo
+    {
+        return $this->belongsTo(TestRun::class);
+    }
 }
