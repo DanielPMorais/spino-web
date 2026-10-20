@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BridgeAuditController;
 use App\Http\Controllers\Admin\JudgeManagementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ManualRuptureResultController;
+use App\Http\Controllers\Admin\TestRunController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
