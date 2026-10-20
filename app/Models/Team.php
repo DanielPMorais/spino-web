@@ -39,4 +39,9 @@ class Team extends Model
     {
         return $this->hasMany(BridgeLoadSample::class);
     }
+
+    public function testRuns(): HasMany
+    {
+        return $this->hasMany(TestRun::class);
+    }
 }
