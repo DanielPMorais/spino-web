@@ -22,6 +22,6 @@ class ClearTestDataCommandTest extends TestCase
 
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('teams', 0);
-        $this->assertDatabaseCount('migrations', 1);
+        $this->assertDatabaseHas('migrations', ['migration' => '0001_01_01_000000_create_users_table']);
     }
 }
