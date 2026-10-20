@@ -8,6 +8,7 @@ const navigation = [
     { label: 'Ensaios', routeName: 'admin.test-runs.index', active: 'admin.test-runs.*', icon: 'test' },
     { label: 'Rupturas', routeName: 'admin.manual-rupture-results.index', active: 'admin.manual-rupture-results.*', icon: 'rupture' },
     { label: 'Juízes', routeName: 'admin.judges.index', active: 'admin.judges.*', icon: 'judges' },
+    { label: 'Equipes e pontes', routeName: 'admin.teams.index', active: 'admin.teams.*', icon: 'audit', requiresUserManagement: true },
     { label: 'Organizadores', routeName: 'admin.organizers.index', active: 'admin.organizers.*', icon: 'teams', requiresUserManagement: true },
 ];
 
