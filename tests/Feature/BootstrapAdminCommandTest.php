@@ -13,7 +13,6 @@ class BootstrapAdminCommandTest extends TestCase
 
     public function test_it_creates_the_configured_administrator(): void
     {
-        config()->set('competition.admin_emails', ['organizacao@example.com']);
         config()->set('competition.bootstrap_admin', [
             'email' => 'organizacao@example.com',
             'name' => 'Comissão organizadora',
@@ -27,40 +26,29 @@ class BootstrapAdminCommandTest extends TestCase
         $user = User::query()->where('email', 'organizacao@example.com')->firstOrFail();
 
         $this->assertTrue(Hash::check('senha-inicial-segura', $user->password));
+        $this->assertSame('admin', $user->role);
         $this->assertNotNull($user->email_verified_at);
     }
 
-    public function test_it_does_not_replace_an_existing_administrator_password(): void
+    public function test_it_promotes_an_existing_account_without_replacing_its_password(): void
     {
-        config()->set('competition.admin_emails', ['organizacao@example.com']);
         config()->set('competition.bootstrap_admin', [
             'email' => 'organizacao@example.com',
             'name' => 'Comissão organizadora',
             'password' => 'nova-senha-segura',
         ]);
 
-        $user = User::factory()->create(['email' => 'organizacao@example.com', 'password' => 'senha-atual-segura']);
-
-        $this->artisan('competition:bootstrap-admin --force')
-            ->expectsOutput('A conta administrativa já existe. A senha atual foi preservada.')
-            ->assertSuccessful();
-
-        $this->assertTrue(Hash::check('senha-atual-segura', $user->fresh()->password));
-    }
-
-    public function test_it_requires_the_bootstrap_email_to_be_an_administrator(): void
-    {
-        config()->set('competition.admin_emails', ['outro@example.com']);
-        config()->set('competition.bootstrap_admin', [
+        $user = User::factory()->create([
             'email' => 'organizacao@example.com',
-            'name' => 'Comissão organizadora',
-            'password' => 'senha-inicial-segura',
+            'password' => 'senha-atual-segura',
+            'role' => 'organizer',
         ]);
 
         $this->artisan('competition:bootstrap-admin --force')
-            ->expectsOutput('Inclua BOOTSTRAP_ADMIN_EMAIL também em COMPETITION_ADMIN_EMAILS.')
-            ->assertFailed();
+            ->expectsOutput('A conta já existia. A senha atual foi preservada e a conta foi promovida a administrador.')
+            ->assertSuccessful();
 
-        $this->assertDatabaseMissing('users', ['email' => 'organizacao@example.com']);
+        $this->assertTrue(Hash::check('senha-atual-segura', $user->fresh()->password));
+        $this->assertSame('admin', $user->fresh()->role);
     }
 }
