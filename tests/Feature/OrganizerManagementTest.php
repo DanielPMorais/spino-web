@@ -10,7 +10,7 @@ class OrganizerManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_an_admin_can_create_an_organizer(): void
+    public function test_an_admin_can_create_and_remove_an_organizer(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
@@ -23,14 +23,17 @@ class OrganizerManagementTest extends TestCase
             ])
             ->assertRedirect(route('admin.organizers.index'));
 
-        $this->assertDatabaseHas('users', [
-            'name' => 'Ana Organizadora',
-            'email' => 'ana@ifsp.edu.br',
-            'role' => 'organizer',
-        ]);
+        $organizer = User::query()->where('email', 'ana@ifsp.edu.br')->firstOrFail();
+        $this->assertSame('organizer', $organizer->role);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.organizers.destroy', $organizer))
+            ->assertRedirect(route('admin.organizers.index'));
+
+        $this->assertDatabaseMissing('users', ['id' => $organizer->id]);
     }
 
-    public function test_an_organizer_cannot_create_platform_users(): void
+    public function test_an_organizer_cannot_manage_platform_users(): void
     {
         $organizer = User::factory()->create(['role' => 'organizer']);
 
