@@ -45,7 +45,19 @@ const competitionPhotos = [
         edition: 'Competição 2025',
     },
 ];
-const campusCourses = ['Técnico em Edificações', 'Bacharelado em Engenharia Civil'];
+const campusCourses = [
+    'Técnico em Administração',
+    'Técnico em Edificações',
+    'Técnico em Informática Integrado ao Ensino Médio',
+    'Técnico em Informática para Internet',
+    'Técnico em Meio Ambiente',
+    'Técnico em Administração Integrado ao Ensino Médio - Proeja',
+    'Bacharelado em Engenharia Civil',
+    'Tecnologia em Análise e Desenvolvimento de Sistemas',
+    'Licenciatura em Física',
+    'Licenciatura em Matemática',
+    'Tecnologia em Processos Gerenciais',
+];
 
 export default function Create({ availability, registrationEndsAt, emailVerification }) {
     const { flash } = usePage().props;
