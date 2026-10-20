@@ -13,13 +13,12 @@ class ManualRuptureResultTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_an_administrator_can_record_a_manual_rupture_result_for_an_armed_run(): void
+    public function test_an_organizer_can_record_a_manual_rupture_result_for_an_armed_run(): void
     {
-        config()->set('competition.admin_emails', ['admin@ifsp.edu.br']);
-        $admin = User::factory()->create(['email' => 'admin@ifsp.edu.br']);
+        $organizer = User::factory()->create(['role' => 'organizer']);
         [$team, $run] = $this->teamWithRun('Equipe Backup', 'BACKUP01');
 
-        $this->actingAs($admin)
+        $this->actingAs($organizer)
             ->post(route('admin.manual-rupture-results.store', $team), [
                 'manual_rupture_load_grams' => 4520,
                 'manual_rupture_notes' => 'Registro manual da comissão.',
@@ -28,7 +27,7 @@ class ManualRuptureResultTest extends TestCase
 
         $team->refresh();
         $this->assertSame(4520, $team->manual_rupture_load_grams);
-        $this->assertSame($admin->id, $team->manual_rupture_recorded_by);
+        $this->assertSame($organizer->id, $team->manual_rupture_recorded_by);
         $this->assertSame('completed', $team->test_status);
         $this->assertNull($team->actual_load_grams);
         $this->assertSame(4520, $run->fresh()->manual_rupture_load_grams);
@@ -37,11 +36,10 @@ class ManualRuptureResultTest extends TestCase
 
     public function test_a_manual_result_does_not_replace_the_sensor_result(): void
     {
-        config()->set('competition.admin_emails', ['admin@ifsp.edu.br']);
-        $admin = User::factory()->create(['email' => 'admin@ifsp.edu.br']);
+        $organizer = User::factory()->create(['role' => 'organizer']);
         [$team] = $this->teamWithRun('Equipe Sensor', 'SENSOR01', 4700);
 
-        $this->actingAs($admin)
+        $this->actingAs($organizer)
             ->post(route('admin.manual-rupture-results.store', $team), [
                 'manual_rupture_load_grams' => 4680,
             ])
