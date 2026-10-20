@@ -121,3 +121,32 @@ O ambiente de produção usa apenas o serviço `app`. O arquivo SQLite fica em `
 Por padrão, o Compose publica a aplicação somente em `127.0.0.1:8080`; o servidor deve encaminhar o domínio por um proxy reverso com HTTPS. Caso o proxy use outra porta, altere `SPINO_HTTP_PORT`. Não exponha o SQLite na rede e mantenha somente uma réplica da aplicação.
 
 Faça backup regular de `data/spino.sqlite` no próprio servidor. SQLite atende bem ao volume deste evento, mas não deve ser colocado em diretório compartilhado de rede nem usado por múltiplos containers da aplicação.
+
+
+## Telemetria de ensaios (M2 → M3)
+
+Antes de iniciar a ruptura, a comissão abre **Administração → Ensaios**, seleciona a equipe e arma o M2 (por exemplo, `M2-01`). Isso cria um `run_id` único e auditável.
+
+O Raspberry consulta o ensaio atual:
+
+```
+GET /api/v1/sensors/devices/M2-01/active-run
+Authorization: Bearer <SENSORS_API_TOKEN>
+```
+
+Com um ensaio ativo, cada leitura deve enviar `test_run_id`, `device_code` e um `sequence` crescente. O servidor rejeita leituras de outro M2, ensaios encerrados e sequências reutilizadas com dados diferentes.
+
+```json
+POST /api/v1/sensors/capture
+{
+  "test_run_id": "uuid-do-ensaio",
+  "device_code": "M2-01",
+  "sequence": 42,
+  "event": "sample",
+  "elapsed_ms": 1250,
+  "load_grams": 3200,
+  "timestamp": "2026-10-22T13:00:00-03:00"
+}
+```
+
+Use `event: "completed"` na última leitura. Se a telemetria falhar, registre a contingência em **Rupturas** após armar o ensaio; a leitura automática continua tendo precedência no placar.
