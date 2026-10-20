@@ -46,4 +46,13 @@ class OrganizerManagementController extends Controller
 
         return to_route('admin.organizers.index')->with('success', 'Organizador criado. Compartilhe a senha inicial por um canal seguro.');
     }
+
+    public function destroy(User $user): RedirectResponse
+    {
+        abort_unless($user->role === 'organizer', 404);
+
+        $user->delete();
+
+        return to_route('admin.organizers.index')->with('success', 'Acesso do organizador removido.');
+    }
 }
