@@ -13,13 +13,12 @@ class TestRunManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_an_administrator_can_arm_a_team_on_an_m2(): void
+    public function test_an_organizer_can_arm_a_team_on_an_m2(): void
     {
-        config()->set('competition.admin_emails', ['admin@ifsp.edu.br']);
-        $admin = User::factory()->create(['email' => 'admin@ifsp.edu.br']);
+        $organizer = User::factory()->create(['role' => 'organizer']);
         $team = $this->approvedTeam();
 
-        $this->actingAs($admin)
+        $this->actingAs($organizer)
             ->post(route('admin.test-runs.store'), ['team_id' => $team->id, 'device_code' => 'm2-01'])
             ->assertRedirect(route('admin.test-runs.index'));
 
@@ -29,13 +28,12 @@ class TestRunManagementTest extends TestCase
 
     public function test_a_team_and_device_cannot_have_two_active_runs(): void
     {
-        config()->set('competition.admin_emails', ['admin@ifsp.edu.br']);
-        $admin = User::factory()->create(['email' => 'admin@ifsp.edu.br']);
+        $organizer = User::factory()->create(['role' => 'organizer']);
         $team = $this->approvedTeam();
         $device = TestDevice::create(['code' => 'M2-01']);
         TestRun::create(['uuid' => '9e8a8f9c-9d0c-4e89-8013-5b453c564e31', 'team_id' => $team->id, 'test_device_id' => $device->id, 'status' => 'armed', 'armed_at' => now()]);
 
-        $this->actingAs($admin)
+        $this->actingAs($organizer)
             ->from(route('admin.test-runs.index'))
             ->post(route('admin.test-runs.store'), ['team_id' => $team->id, 'device_code' => 'M2-01'])
             ->assertRedirect(route('admin.test-runs.index'))
