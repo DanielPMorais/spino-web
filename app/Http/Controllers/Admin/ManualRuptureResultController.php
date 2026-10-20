@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Team;
+use App\Models\TestRun;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,16 +45,35 @@ class ManualRuptureResultController extends Controller
             'manual_rupture_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $run = TestRun::query()
+            ->where('team_id', $team->id)
+            ->whereIn('status', ['armed', 'running', 'finished'])
+            ->latest('armed_at')
+            ->first();
+
+        if (! $run) {
+            return back()->withErrors(['manual_rupture_load_grams' => 'Arme um ensaio para a equipe antes de registrar a contingência.']);
+        }
+
+        $recordedAt = now();
+        $run->update([
+            ...$data,
+            'manual_rupture_recorded_at' => $recordedAt,
+            'manual_rupture_recorded_by' => $request->user()->id,
+            'status' => 'finished',
+            'finished_at' => $run->finished_at ?? $recordedAt,
+        ]);
+
         $team->update([
             ...$data,
-            'manual_rupture_recorded_at' => now(),
+            'manual_rupture_recorded_at' => $recordedAt,
             'manual_rupture_recorded_by' => $request->user()->id,
             // O valor do sensor, se existir, continua preservado e tem precedência no placar.
             'test_status' => 'completed',
-            'tested_at' => $team->tested_at ?? now(),
+            'tested_at' => $team->tested_at ?? $recordedAt,
         ]);
 
         return to_route('admin.manual-rupture-results.index')
-            ->with('success', 'Peso de ruptura manual registrado como contingência.');
+            ->with('success', 'Peso de ruptura manual registrado como contingência do ensaio.');
     }
 }
