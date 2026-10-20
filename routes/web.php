@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\BridgeAuditController;
 use App\Http\Controllers\Admin\JudgeManagementController;
 use App\Http\Controllers\Admin\OrganizerManagementController;
+use App\Http\Controllers\Admin\TeamManagementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ManualRuptureResultController;
 use App\Http\Controllers\Admin\TestRunController;
@@ -61,6 +62,10 @@ Route::middleware('auth')->group(function () {
         Route::middleware('can:manage-users')->group(function () {
             Route::get('/admin/organizadores', [OrganizerManagementController::class, 'index'])->name('admin.organizers.index');
             Route::post('/admin/organizadores', [OrganizerManagementController::class, 'store'])->name('admin.organizers.store');
+            Route::delete('/admin/organizadores/{user}', [OrganizerManagementController::class, 'destroy'])->name('admin.organizers.destroy');
+            Route::get('/admin/equipes', [TeamManagementController::class, 'index'])->name('admin.teams.index');
+            Route::post('/admin/equipes', [TeamManagementController::class, 'store'])->name('admin.teams.store');
+            Route::delete('/admin/equipes/{team}', [TeamManagementController::class, 'destroy'])->name('admin.teams.destroy');
         });
     });
 
