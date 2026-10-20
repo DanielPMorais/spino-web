@@ -13,6 +13,7 @@ class BootstrapAdminCommandTest extends TestCase
 
     public function test_it_creates_the_configured_administrator(): void
     {
+        config()->set('competition.admin_emails', ['organizacao@example.com']);
         config()->set('competition.bootstrap_admin', [
             'email' => 'organizacao@example.com',
             'name' => 'Comissão organizadora',
@@ -30,8 +31,9 @@ class BootstrapAdminCommandTest extends TestCase
         $this->assertNotNull($user->email_verified_at);
     }
 
-    public function test_it_promotes_an_existing_account_without_replacing_its_password(): void
+    public function test_it_preserves_an_existing_administrator_password(): void
     {
+        config()->set('competition.admin_emails', ['organizacao@example.com']);
         config()->set('competition.bootstrap_admin', [
             'email' => 'organizacao@example.com',
             'name' => 'Comissão organizadora',
@@ -45,10 +47,26 @@ class BootstrapAdminCommandTest extends TestCase
         ]);
 
         $this->artisan('competition:bootstrap-admin --force')
-            ->expectsOutput('A conta já existia. A senha atual foi preservada e a conta foi promovida a administrador.')
+            ->expectsOutput('A conta administrativa já existe. A senha atual foi preservada.')
             ->assertSuccessful();
 
         $this->assertTrue(Hash::check('senha-atual-segura', $user->fresh()->password));
         $this->assertSame('admin', $user->fresh()->role);
+    }
+
+    public function test_it_requires_the_bootstrap_email_to_be_an_administrator(): void
+    {
+        config()->set('competition.admin_emails', ['outro@example.com']);
+        config()->set('competition.bootstrap_admin', [
+            'email' => 'organizacao@example.com',
+            'name' => 'Comissão organizadora',
+            'password' => 'senha-inicial-segura',
+        ]);
+
+        $this->artisan('competition:bootstrap-admin --force')
+            ->expectsOutput('Inclua BOOTSTRAP_ADMIN_EMAIL também em COMPETITION_ADMIN_EMAILS.')
+            ->assertFailed();
+
+        $this->assertDatabaseMissing('users', ['email' => 'organizacao@example.com']);
     }
 }
