@@ -41,7 +41,7 @@ Artisan::command('competition:clear-test-data {--force : Confirma a remoção ir
     return Command::SUCCESS;
 })->purpose('Remove todos os dados de aplicação do PostgreSQL de produção');
 
-Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do administrador inicial}', function (): int {
+Artisan::command('competition:bootstrap-admin {--force : Confirma a criação ou promoção do administrador inicial}', function (): int {
     if (! $this->option('force')) {
         $this->error('Operação cancelada. Execute novamente com --force para confirmar.');
 
@@ -51,19 +51,9 @@ Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do
     $email = mb_strtolower(trim((string) config('competition.bootstrap_admin.email')));
     $name = trim((string) config('competition.bootstrap_admin.name'));
     $password = (string) config('competition.bootstrap_admin.password');
-    $administratorEmails = array_map(
-        fn (string $administratorEmail) => mb_strtolower(trim($administratorEmail)),
-        config('competition.admin_emails'),
-    );
 
     if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $this->error('BOOTSTRAP_ADMIN_EMAIL deve conter um e-mail válido.');
-
-        return Command::FAILURE;
-    }
-
-    if (! in_array($email, $administratorEmails, true)) {
-        $this->error('Inclua BOOTSTRAP_ADMIN_EMAIL também em COMPETITION_ADMIN_EMAILS.');
 
         return Command::FAILURE;
     }
@@ -79,15 +69,17 @@ Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do
         [
             'name' => $name !== '' ? $name : 'Comissão organizadora',
             'password' => Hash::make($password),
+            'role' => 'admin',
         ],
     );
 
-    if ($user->wasRecentlyCreated) {
-        $user->forceFill(['email_verified_at' => now()])->save();
-    }
+    $user->forceFill([
+        'role' => 'admin',
+        'email_verified_at' => $user->email_verified_at ?? now(),
+    ])->save();
 
     if (! $user->wasRecentlyCreated) {
-        $this->warn('A conta administrativa já existe. A senha atual foi preservada.');
+        $this->warn('A conta já existia. A senha atual foi preservada e a conta foi promovida a administrador.');
 
         return Command::SUCCESS;
     }
@@ -95,4 +87,4 @@ Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do
     $this->info("Conta administrativa criada para {$email}.");
 
     return Command::SUCCESS;
-})->purpose('Cria uma única conta administrativa a partir das variáveis de ambiente');
+})->purpose('Cria ou promove a conta administrativa inicial a partir das variáveis de ambiente');
