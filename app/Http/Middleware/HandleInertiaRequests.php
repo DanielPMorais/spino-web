@@ -34,6 +34,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'canManageRegistrations' => $request->user() ? $request->user()->can('manage-registrations') : false,
+                'canManageUsers' => $request->user() ? $request->user()->can('manage-users') : false,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
