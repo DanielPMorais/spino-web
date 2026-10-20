@@ -58,6 +58,8 @@ class SensorCaptureController extends Controller
                 throw ValidationException::withMessages(['test_run_id' => 'A equipe não está aprovada para ensaio.']);
             }
 
+            $run->device->update(['last_seen_at' => now()]);
+
             $existing = $run->samples()->where('sequence', $data['sequence'])->first();
             if ($existing) {
                 if ($existing->load_grams !== $data['load_grams'] || $existing->elapsed_ms !== $data['elapsed_ms']) {
@@ -75,8 +77,6 @@ class SensorCaptureController extends Controller
                 'load_grams' => $data['load_grams'],
                 'created_at' => $capturedAt,
             ]);
-
-            $run->device->update(['last_seen_at' => now()]);
 
             if ($event === 'completed') {
                 $peakLoad = max((int) $data['load_grams'], (int) ($run->samples()->max('load_grams') ?? 0));
