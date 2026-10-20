@@ -7,8 +7,11 @@ use App\Http\Controllers\AudienceDashboardController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\BridgeAuditController;
 use App\Http\Controllers\Admin\JudgeManagementController;
+use App\Http\Controllers\Admin\OrganizerManagementController;
+use App\Http\Controllers\Admin\TeamManagementController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ManualRuptureResultController;
+use App\Http\Controllers\Admin\TestRunController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -45,12 +48,27 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/organizacao', [BridgeAuditController::class, 'index'])->name('admin.bridge-audits.index');
         Route::get('/admin/organizacao/{team}', [BridgeAuditController::class, 'show'])->name('admin.bridge-audits.show');
         Route::post('/admin/organizacao/{team}', [BridgeAuditController::class, 'store'])->name('admin.bridge-audits.store');
+        Route::get('/admin/ensaios', [TestRunController::class, 'index'])->name('admin.test-runs.index');
+        Route::post('/admin/ensaios', [TestRunController::class, 'store'])->name('admin.test-runs.store');
+        Route::post('/admin/ensaios/{testRun}/iniciar', [TestRunController::class, 'start'])->name('admin.test-runs.start');
+        Route::post('/admin/ensaios/{testRun}/finalizar', [TestRunController::class, 'finish'])->name('admin.test-runs.finish');
+        Route::post('/admin/ensaios/{testRun}/cancelar', [TestRunController::class, 'cancel'])->name('admin.test-runs.cancel');
         Route::get('/admin/resultados/ruptura', [ManualRuptureResultController::class, 'index'])->name('admin.manual-rupture-results.index');
         Route::post('/admin/resultados/ruptura/{team}', [ManualRuptureResultController::class, 'store'])->name('admin.manual-rupture-results.store');
         Route::get('/admin/juizes', [JudgeManagementController::class, 'index'])->name('admin.judges.index');
         Route::post('/admin/juizes', [JudgeManagementController::class, 'store'])->name('admin.judges.store');
         Route::patch('/admin/juizes/janela-votacao', [JudgeManagementController::class, 'toggleVoting'])->name('admin.judges.toggle-voting');
+
+        Route::middleware('can:manage-users')->group(function () {
+            Route::get('/admin/organizadores', [OrganizerManagementController::class, 'index'])->name('admin.organizers.index');
+            Route::post('/admin/organizadores', [OrganizerManagementController::class, 'store'])->name('admin.organizers.store');
+            Route::delete('/admin/organizadores/{user}', [OrganizerManagementController::class, 'destroy'])->name('admin.organizers.destroy');
+            Route::get('/admin/equipes', [TeamManagementController::class, 'index'])->name('admin.teams.index');
+            Route::post('/admin/equipes', [TeamManagementController::class, 'store'])->name('admin.teams.store');
+            Route::delete('/admin/equipes/{team}', [TeamManagementController::class, 'destroy'])->name('admin.teams.destroy');
+        });
     });
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

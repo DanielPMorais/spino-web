@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -27,13 +28,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Vite::prefetch(concurrency: 3);
-        Gate::define('manage-registrations', function ($user): bool {
-            $administratorEmails = array_map(
-                fn (string $email) => mb_strtolower(trim($email)),
-                config('competition.admin_emails'),
-            );
 
-            return in_array(mb_strtolower(trim($user->email)), $administratorEmails, true);
-        });
+        Gate::define('manage-registrations', fn (User $user): bool => $user->isOrganizer());
+        Gate::define('manage-users', fn (User $user): bool => $user->isAdmin());
     }
 }

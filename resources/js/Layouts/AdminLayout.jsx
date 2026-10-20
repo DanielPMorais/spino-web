@@ -5,8 +5,11 @@ const navigation = [
     { label: 'Visão geral', routeName: 'admin.dashboard', active: 'admin.dashboard', icon: 'dashboard' },
     { label: 'Inscrições', routeName: 'admin.registrations.index', active: 'admin.registrations.*', icon: 'teams' },
     { label: 'Organização', routeName: 'admin.bridge-audits.index', active: 'admin.bridge-audits.*', icon: 'audit' },
+    { label: 'Ensaios', routeName: 'admin.test-runs.index', active: 'admin.test-runs.*', icon: 'test' },
     { label: 'Rupturas', routeName: 'admin.manual-rupture-results.index', active: 'admin.manual-rupture-results.*', icon: 'rupture' },
     { label: 'Juízes', routeName: 'admin.judges.index', active: 'admin.judges.*', icon: 'judges' },
+    { label: 'Equipes e pontes', routeName: 'admin.teams.index', active: 'admin.teams.*', icon: 'audit', requiresUserManagement: true },
+    { label: 'Organizadores', routeName: 'admin.organizers.index', active: 'admin.organizers.*', icon: 'teams', requiresUserManagement: true },
 ];
 
 export default function AdminLayout({ title, description, children, actions = null }) {
@@ -67,7 +70,8 @@ function AdminBrand() {
 }
 
 function AdminNavigation({ onNavigate }) {
-    return <nav className="grid gap-1 px-3 py-5" aria-label="Navegação administrativa">{navigation.map((item) => {
+    const { auth } = usePage().props;
+    return <nav className="grid gap-1 px-3 py-5" aria-label="Navegação administrativa">{navigation.filter((item) => !item.requiresUserManagement || auth.canManageUsers).map((item) => {
         const active = route().current(item.active);
         return <Link key={item.routeName} href={route(item.routeName)} onClick={onNavigate} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${active ? 'bg-white text-[#172938] shadow' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}><AdminIcon name={item.icon} />{item.label}</Link>;
     })}</nav>;
@@ -86,6 +90,7 @@ function AdminIcon({ name }) {
         dashboard: 'M4 4h6v6H4V4Zm10 0h6v9h-6V4ZM4 14h6v6H4v-6Zm10 3h6v3h-6v-3Z',
         teams: 'M16 11a4 4 0 1 0-3.2-6.4M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4 0-6 2-6 5v2h12v-2c0-3-2-5-6-5Zm8 0c-.7 0-1.4.1-2 .3 1.4 1.1 2 2.7 2 4.7v2h6v-2c0-3-2-5-6-5Z',
         audit: 'M9 3h6l1 2h3v16H5V5h3l1-2Zm-1 7h8M8 14h8M8 18h5',
+        test: 'M5 3h14v4l-4 5v6l-3 3-3-3v-6L5 7V3Zm4 4h6',
         rupture: 'M12 3v10m0 0 4-4m-4 4-4-4M5 19h14M7 19v2m10-2v2',
         judges: 'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-7 17c0-4 2.5-7 7-7s7 3 7 7H5Zm14-10 2 2 3-4',
     };

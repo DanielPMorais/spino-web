@@ -18,28 +18,61 @@ Artisan::command('competition:clear-test-data {--force : Confirma a remoção ir
         return Command::FAILURE;
     }
 
-    if (DB::getDriverName() !== 'pgsql') {
-        $this->error('Este comando foi criado para o PostgreSQL do Render.');
+    $driver = DB::getDriverName();
 
-        return Command::FAILURE;
-    }
+    if ($driver === 'sqlite') {
+        $tables = collect(DB::select("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT IN ('migrations', 'sqlite_sequence') AND name NOT LIKE 'sqlite_%'"))
+            ->pluck('name');
 
-    $tables = collect(DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'migrations'"))
-        ->pluck('tablename')
-        ->map(fn (string $table) => '"'.str_replace('"', '""', $table).'"')
-        ->implode(', ');
+        if ($tables->isEmpty()) {
+            $this->info('Nenhuma tabela de dados encontrada para limpar.');
 
-    if ($tables === '') {
-        $this->info('Nenhuma tabela de dados encontrada para limpar.');
+            return Command::SUCCESS;
+        }
+
+        DB::statement('PRAGMA foreign_keys = OFF');
+
+        try {
+            foreach ($tables as $table) {
+                DB::table($table)->delete();
+            }
+
+            $hasSequenceTable = collect(DB::select("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sqlite_sequence'"))->isNotEmpty();
+
+            if ($hasSequenceTable) {
+                DB::table('sqlite_sequence')->whereIn('name', $tables)->delete();
+            }
+        } finally {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
+
+        $this->info('Dados de teste removidos. A tabela migrations foi preservada.');
 
         return Command::SUCCESS;
     }
 
-    DB::statement("TRUNCATE TABLE {$tables} RESTART IDENTITY CASCADE");
-    $this->info('Dados de teste removidos. A tabela migrations foi preservada.');
+    if ($driver === 'pgsql') {
+        $tables = collect(DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'migrations'"))
+            ->pluck('tablename')
+            ->map(fn (string $table) => '"'.str_replace('"', '""', $table).'"')
+            ->implode(', ');
 
-    return Command::SUCCESS;
-})->purpose('Remove todos os dados de aplicação do PostgreSQL de produção');
+        if ($tables === '') {
+            $this->info('Nenhuma tabela de dados encontrada para limpar.');
+
+            return Command::SUCCESS;
+        }
+
+        DB::statement("TRUNCATE TABLE {$tables} RESTART IDENTITY CASCADE");
+        $this->info('Dados de teste removidos. A tabela migrations foi preservada.');
+
+        return Command::SUCCESS;
+    }
+
+    $this->error("Banco {$driver} não é suportado por este comando.");
+
+    return Command::FAILURE;
+})->purpose('Remove todos os dados de aplicação, preservando a tabela migrations');
 
 Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do administrador inicial}', function (): int {
     if (! $this->option('force')) {
@@ -79,12 +112,14 @@ Artisan::command('competition:bootstrap-admin {--force : Confirma a criação do
         [
             'name' => $name !== '' ? $name : 'Comissão organizadora',
             'password' => Hash::make($password),
+            'role' => 'admin',
         ],
     );
 
-    if ($user->wasRecentlyCreated) {
-        $user->forceFill(['email_verified_at' => now()])->save();
-    }
+    $user->forceFill([
+        'role' => 'admin',
+        'email_verified_at' => $user->email_verified_at ?? now(),
+    ])->save();
 
     if (! $user->wasRecentlyCreated) {
         $this->warn('A conta administrativa já existe. A senha atual foi preservada.');
