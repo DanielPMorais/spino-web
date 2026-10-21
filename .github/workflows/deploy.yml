@@ -1,0 +1,29 @@
+name: Auto Deploy via SSH
+
+on:
+  push:
+    branches:
+      - main # Dispara o deploy quando houver push na branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Executar comandos via SSH no Servidor
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            php artisan down
+            cp database/database.sqlite database/database-$(date '+%Y-%m-%d_%Hh%Mm%Ss').sqlite
+            composer install
+            php artisan migrate --force
+            php artisan optimize
+            php artisan reload
+            npm install
+            npm run build
+            php artisan up
