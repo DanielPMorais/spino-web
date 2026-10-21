@@ -21,9 +21,6 @@ services:
             - '.:/app'
         networks:
             - sail
-            - npm_network
 networks:
-    npm_network:
-        external: true
     sail:
         driver: bridge
