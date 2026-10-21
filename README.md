@@ -103,7 +103,6 @@ O ambiente de produção usa apenas o serviço `app`. O arquivo SQLite fica em `
    MAIL_USERNAME=usuario
    MAIL_PASSWORD=senha-ou-app-password
    MAIL_FROM_ADDRESS=remetente@dominio
-   SENSORS_API_TOKEN=gere-um-token-longo-e-aleatorio
    ```
 
    Gere uma chave e copie o resultado para `APP_KEY`:
@@ -131,10 +130,9 @@ O Raspberry consulta o ensaio atual:
 
 ```
 GET /api/v1/sensors/devices/M2-01/active-run
-Authorization: Bearer <SENSORS_API_TOKEN>
 ```
 
-Com um ensaio ativo, cada leitura deve enviar `test_run_id`, `device_code` e um `sequence` crescente. O servidor rejeita leituras de outro M2, ensaios encerrados e sequências reutilizadas com dados diferentes.
+A API do M2 aceita consultas e envios sem token. Com um ensaio ativo, cada leitura deve enviar `test_run_id`, `device_code` e um `sequence` crescente. O servidor rejeita leituras de outro M2, ensaios encerrados e sequências reutilizadas com dados diferentes.
 
 ```json
 POST /api/v1/sensors/capture

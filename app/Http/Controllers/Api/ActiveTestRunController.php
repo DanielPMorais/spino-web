@@ -6,18 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\TestDevice;
 use App\Models\TestRun;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ActiveTestRunController extends Controller
 {
-    public function __invoke(Request $request, string $deviceCode): JsonResponse
+    public function __invoke(string $deviceCode): JsonResponse
     {
-        $expectedToken = (string) config('sensors.token');
-
-        if ($expectedToken === '' || ! hash_equals($expectedToken, (string) $request->bearerToken())) {
-            return response()->json(['message' => 'Não autorizado.'], 401);
-        }
-
         $device = TestDevice::query()
             ->where('code', strtoupper($deviceCode))
             ->first();
