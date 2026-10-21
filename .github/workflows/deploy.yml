@@ -18,6 +18,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            touch arquivo_criado_pelo_git_actions
             php artisan down
             cp database/database.sqlite database/database-$(date '+%Y-%m-%d_%Hh%Mm%Ss').sqlite
             composer install
