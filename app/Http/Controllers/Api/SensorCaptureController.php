@@ -16,12 +16,6 @@ class SensorCaptureController extends Controller
     /** Recebe uma leitura do M2 vinculada a um ensaio armado no M3. */
     public function __invoke(Request $request): JsonResponse
     {
-        $expectedToken = (string) config('sensors.token');
-
-        if ($expectedToken === '' || ! hash_equals($expectedToken, (string) $request->bearerToken())) {
-            return response()->json(['message' => 'Não autorizado.'], 401);
-        }
-
         $data = $request->validate([
             'test_run_id' => ['required', 'uuid'],
             'device_code' => ['required', 'string', 'max:32'],

@@ -13,17 +13,11 @@ class SensorCaptureApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        config()->set('sensors.token', 'raspberry-test-token');
-    }
-
     public function test_it_records_a_sample_for_the_armed_test_run(): void
     {
         [$team, $device, $run] = $this->armedRun();
 
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', [
+        $this->postJson('/api/v1/sensors/capture', [
             'test_run_id' => $run->uuid,
             'device_code' => $device->code,
             'sequence' => 1,
@@ -42,7 +36,7 @@ class SensorCaptureApiTest extends TestCase
         [$team, $device, $run] = $this->armedRun();
         BridgeLoadSample::create(['team_id' => $team->id, 'test_run_id' => $run->id, 'sequence' => 1, 'elapsed_ms' => 1000, 'load_grams' => 4500]);
 
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', [
+        $this->postJson('/api/v1/sensors/capture', [
             'test_run_id' => $run->uuid,
             'device_code' => $device->code,
             'sequence' => 2,
@@ -61,7 +55,7 @@ class SensorCaptureApiTest extends TestCase
     {
         [, , $run] = $this->armedRun();
 
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', [
+        $this->postJson('/api/v1/sensors/capture', [
             'test_run_id' => $run->uuid,
             'device_code' => 'M2-OUTRO',
             'sequence' => 1,
@@ -75,11 +69,11 @@ class SensorCaptureApiTest extends TestCase
         [, $device, $run] = $this->armedRun();
         $payload = ['test_run_id' => $run->uuid, 'device_code' => $device->code, 'sequence' => 1, 'elapsed_ms' => 100, 'load_grams' => 700];
 
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', $payload)
+        $this->postJson('/api/v1/sensors/capture', $payload)
             ->assertAccepted()->assertJsonPath('duplicate', false);
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', $payload)
+        $this->postJson('/api/v1/sensors/capture', $payload)
             ->assertAccepted()->assertJsonPath('duplicate', true);
-        $this->withToken('raspberry-test-token')->postJson('/api/v1/sensors/capture', [...$payload, 'load_grams' => 800])
+        $this->postJson('/api/v1/sensors/capture', [...$payload, 'load_grams' => 800])
             ->assertUnprocessable();
     }
 
@@ -87,20 +81,19 @@ class SensorCaptureApiTest extends TestCase
     {
         [$team, $device, $run] = $this->armedRun();
 
-        $this->withToken('raspberry-test-token')
-            ->getJson("/api/v1/sensors/devices/{$device->code}/active-run")
+        $this->getJson("/api/v1/sensors/devices/{$device->code}/active-run")
             ->assertOk()
             ->assertJsonPath('active', true)
             ->assertJsonPath('run_id', $run->uuid)
             ->assertJsonPath('team.code', $team->code);
     }
 
-    public function test_it_rejects_a_missing_or_invalid_token(): void
+    public function test_it_rejects_a_capture_for_an_unknown_run_without_a_token(): void
     {
         $this->postJson('/api/v1/sensors/capture', [
             'test_run_id' => '9e8a8f9c-9d0c-4e89-8013-5b453c564e31', 'device_code' => 'M2-01',
             'sequence' => 1, 'elapsed_ms' => 0, 'load_grams' => 0,
-        ])->assertUnauthorized();
+        ])->assertUnprocessable();
     }
 
     private function armedRun(): array
