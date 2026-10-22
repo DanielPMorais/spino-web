@@ -502,7 +502,7 @@ button, input, select { font: inherit; }
     width: min(100%, 1650px);
     min-height: 72px;
     display: grid;
-    grid-template-columns: max-content 1px minmax(220px, 1fr) clamp(220px, 28vw, 430px);
+    grid-template-columns: max-content 1px minmax(220px, 1fr) clamp(220px, 22vw, 320px);
     align-items: center;
     gap: 26px;
     margin: 0 auto;
@@ -541,7 +541,7 @@ button, input, select { font: inherit; }
     height: 100%;
     display: block;
     object-fit: contain;
-    object-position: left center;
+    object-position: 12% center;
     opacity: 0;
     transform: translateX(16px);
     transition: opacity .45s ease, transform .45s ease;
