@@ -34,9 +34,9 @@ export default function OrganizersIndex({ organizers }) {
             <section className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm sm:p-7">
                 <h2 className="text-xl font-bold">Acessos existentes</h2>
                 <p className="mt-1 text-sm text-slate-500">{organizers.length} organizador(es) cadastrado(s).</p>
-                <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[560px] text-left text-sm">
+                <div className="admin-table-wrap mt-6 overflow-x-auto"><table className="admin-responsive-table w-full min-w-[560px] text-left text-sm">
                     <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-500"><tr><th className="rounded-l-md px-4 py-3">Nome</th><th className="px-4 py-3">E-mail</th><th className="rounded-r-md px-4 py-3 text-right">Ação</th></tr></thead>
-                    <tbody className="divide-y divide-slate-200">{organizers.map((user) => <tr key={user.id}><td className="px-4 py-4 font-semibold">{user.name}</td><td className="px-4 py-4 text-slate-600">{user.email}</td><td className="px-4 py-4 text-right"><button type="button" onClick={() => destroy(user)} className="rounded-md px-2 py-1 text-xs font-bold text-rose-700 hover:bg-rose-50">Excluir</button></td></tr>)}</tbody>
+                    <tbody className="divide-y divide-slate-200">{organizers.map((user) => <tr key={user.id}><td data-label="Nome" className="px-4 py-4 font-semibold">{user.name}</td><td data-label="E-mail" className="px-4 py-4 text-slate-600">{user.email}</td><td data-label="Ação" className="px-4 py-4 text-right"><button type="button" onClick={() => destroy(user)} className="rounded-md px-2 py-1 text-xs font-bold text-rose-700 hover:bg-rose-50">Excluir</button></td></tr>)}</tbody>
                 </table>{!organizers.length && <p className="py-12 text-center text-sm text-slate-500">Nenhum organizador cadastrado.</p>}</div>
             </section>
         </div>

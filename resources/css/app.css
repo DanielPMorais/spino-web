@@ -490,6 +490,76 @@ button, input, select { font: inherit; }
 
 
 
+/* Responsive administration tables and touch targets */
+@media (max-width: 767px) {
+    .admin-table-wrap {
+        overflow: visible;
+    }
+
+    .admin-responsive-table {
+        display: block;
+        min-width: 0 !important;
+    }
+
+    .admin-responsive-table thead {
+        display: none;
+    }
+
+    .admin-responsive-table tbody {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .admin-responsive-table tbody tr {
+        display: block;
+        overflow: hidden;
+        border: 1px solid rgb(226 232 240);
+        border-radius: 0.875rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+    }
+
+    .admin-responsive-table tbody td {
+        display: block;
+        min-width: 0;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgb(241 245 249);
+        text-align: left !important;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-responsive-table tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-responsive-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.3rem;
+        color: rgb(100 116 139);
+        font-size: 0.6875rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        line-height: 1rem;
+        text-transform: uppercase;
+    }
+
+    .admin-responsive-table tbody td > div {
+        min-width: 0;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .admin-responsive-table tbody td button,
+    .admin-responsive-table tbody td a {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        padding-inline: 0.75rem;
+    }
+}
+
 /* Sponsor banner on the public registration page */
 .sponsor-banner {
     min-height: 230px;
