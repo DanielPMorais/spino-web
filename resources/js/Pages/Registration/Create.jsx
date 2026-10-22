@@ -45,6 +45,19 @@ const competitionPhotos = [
         edition: 'Competição 2025',
     },
 ];
+const sponsors = [
+    {
+        src: '/images/sponsors/ideal-grupo.jpg',
+        alt: 'Ideal Grupo',
+        className: 'sponsor-logo sponsor-logo-ideal',
+    },
+    {
+        src: '/images/sponsors/disa-arcelormittal.jpg',
+        alt: 'Disa Ferro-Aço e ArcelorMittal',
+        className: 'sponsor-logo sponsor-logo-disa',
+    },
+];
+
 const campusCourses = [
     'Técnico em Administração',
     'Técnico em Edificações',
@@ -102,6 +115,7 @@ export default function Create({ availability, registrationEndsAt, emailVerifica
             <Head title="Inscrição — Concurso de Pontes de Palito" />
             <div className="registration-page">
                 <EventHeader />
+                <SponsorCarousel />
 
                 <main className="registration-stage">
                     {hasSuccess && !successDismissed ? (
@@ -341,6 +355,46 @@ function EventHeader() {
                 <div className="institution-logo-group"><span>APOIO</span><img className="casec-logo" src="/images/logo-casec-jr.png" alt="CASEC Jr. — apoio" /></div>
             </div>
         </header>
+    );
+}
+
+function SponsorCarousel() {
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = window.setInterval(() => {
+            setActiveIndex((current) => (current + 1) % sponsors.length);
+        }, 6000);
+
+        return () => window.clearInterval(timer);
+    }, []);
+
+    return (
+        <section className="sponsor-strip" aria-label="Patrocinadores da competição">
+            <span className="sponsor-label">Patrocínio</span>
+            <div className="sponsor-carousel" aria-live="off">
+                {sponsors.map((sponsor, index) => (
+                    <img
+                        key={sponsor.src}
+                        className={`${sponsor.className}${index === activeIndex ? ' is-active' : ''}`}
+                        src={sponsor.src}
+                        alt={index === activeIndex ? sponsor.alt : ''}
+                    />
+                ))}
+            </div>
+            <div className="sponsor-indicators" aria-label="Selecione um patrocinador">
+                {sponsors.map((sponsor, index) => (
+                    <button
+                        key={sponsor.src}
+                        type="button"
+                        className={index === activeIndex ? 'is-active' : ''}
+                        aria-label={`Exibir patrocinador: ${sponsor.alt}`}
+                        aria-pressed={index === activeIndex}
+                        onClick={() => setActiveIndex(index)}
+                    />
+                ))}
+            </div>
+        </section>
     );
 }
 
