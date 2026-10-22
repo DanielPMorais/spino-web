@@ -355,7 +355,7 @@ function SponsorBanner() {
                 <div className="sponsor-logos">
                     <img
                         className="sponsor-logo sponsor-logo--disa"
-                        src="/images/sponsors/disa-logo-transparent-v3.png"
+                        src="/images/sponsors/disa-logo-transparent-v4.png"
                         alt="Disa Ferro-Aço"
                     />
                     <span className="sponsor-divider" aria-hidden="true" />
