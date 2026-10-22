@@ -360,6 +360,7 @@ function EventHeader() {
 
 function SponsorCarousel() {
     const [activeIndex, setActiveIndex] = useState(0);
+    const nextIndex = (activeIndex + 1) % sponsors.length;
 
     useEffect(() => {
         const timer = window.setInterval(() => {
@@ -371,28 +372,37 @@ function SponsorCarousel() {
 
     return (
         <section className="sponsor-strip" aria-label="Patrocinadores da competição">
-            <span className="sponsor-label">Patrocínio</span>
-            <div className="sponsor-carousel" aria-live="off">
-                {sponsors.map((sponsor, index) => (
-                    <img
-                        key={sponsor.src}
-                        className={`${sponsor.className}${index === activeIndex ? ' is-active' : ''}`}
-                        src={sponsor.src}
-                        alt={index === activeIndex ? sponsor.alt : ''}
-                    />
-                ))}
-            </div>
-            <div className="sponsor-indicators" aria-label="Selecione um patrocinador">
-                {sponsors.map((sponsor, index) => (
-                    <button
-                        key={sponsor.src}
-                        type="button"
-                        className={index === activeIndex ? 'is-active' : ''}
-                        aria-label={`Exibir patrocinador: ${sponsor.alt}`}
-                        aria-pressed={index === activeIndex}
-                        onClick={() => setActiveIndex(index)}
-                    />
-                ))}
+            <div className="sponsor-strip-inner">
+                <span className="sponsor-label">Patrocínio</span>
+                <i className="sponsor-divider" aria-hidden="true" />
+
+                <div className="sponsor-primary" aria-live="off">
+                    {sponsors.map((sponsor, index) => (
+                        <img
+                            key={sponsor.src}
+                            className={index === activeIndex ? 'is-active' : ''}
+                            src={sponsor.src}
+                            alt={index === activeIndex ? sponsor.alt : ''}
+                        />
+                    ))}
+                </div>
+
+                <div className="sponsor-preview" aria-hidden="true">
+                    <img src={sponsors[nextIndex].src} alt="" />
+                </div>
+
+                <div className="sponsor-indicators" aria-label="Selecione um patrocinador">
+                    {sponsors.map((sponsor, index) => (
+                        <button
+                            key={sponsor.src}
+                            type="button"
+                            className={index === activeIndex ? 'is-active' : ''}
+                            aria-label={`Exibir patrocinador: ${sponsor.alt}`}
+                            aria-pressed={index === activeIndex}
+                            onClick={() => setActiveIndex(index)}
+                        />
+                    ))}
+                </div>
             </div>
         </section>
     );

@@ -488,23 +488,31 @@ button, input, select { font: inherit; }
 }
 
 
+
 /* Sponsor carousel on the public registration page */
 .sponsor-strip {
-    display: grid;
-    grid-template-columns: minmax(128px, max-content) minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 24px;
-    min-height: 92px;
-    padding: 12px max(28px, calc((100vw - 1360px) / 2));
-    border-bottom: 3px solid #d97822;
+    position: relative;
+    min-height: 94px;
+    padding: 11px max(24px, calc((100vw - 1700px) / 2));
     color: #fff;
-    background: #103529;
+    background: linear-gradient(90deg, #103529 0%, #0d3025 100%);
+}
+.sponsor-strip-inner {
+    position: relative;
+    width: min(100%, 1650px);
+    min-height: 72px;
+    display: grid;
+    grid-template-columns: max-content 1px minmax(220px, 1fr) clamp(220px, 28vw, 430px);
+    align-items: center;
+    gap: 26px;
+    margin: 0 auto;
 }
 .sponsor-label {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 38px;
-    padding: 0 14px;
+    padding: 0 16px;
     border-radius: 4px;
     color: #132c21;
     background: #e6a246;
@@ -513,37 +521,61 @@ button, input, select { font: inherit; }
     letter-spacing: .16em;
     text-transform: uppercase;
 }
-.sponsor-carousel {
-    position: relative;
-    min-width: 0;
-    height: 64px;
-    overflow: hidden;
-    border-radius: 8px;
-    background: #08251b;
+.sponsor-divider {
+    width: 1px;
+    height: 54px;
+    background: rgba(255, 255, 255, .42);
 }
-.sponsor-logo {
+.sponsor-primary,
+.sponsor-preview {
+    position: relative;
+    height: 72px;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #071b15;
+}
+.sponsor-primary img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
     object-fit: contain;
+    object-position: left center;
     opacity: 0;
-    transform: translateX(14px);
+    transform: translateX(16px);
     transition: opacity .45s ease, transform .45s ease;
 }
-.sponsor-logo.is-active {
+.sponsor-primary img.is-active {
     opacity: 1;
     transform: translateX(0);
 }
-.sponsor-logo-disa {
+.sponsor-preview {
+    opacity: .76;
+}
+.sponsor-preview::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: linear-gradient(90deg, rgba(13, 48, 37, .3), transparent 35%);
+    pointer-events: none;
+}
+.sponsor-preview img {
+    width: 100%;
+    height: 100%;
+    display: block;
     object-fit: cover;
-    object-position: center 57%;
+    object-position: center;
 }
 .sponsor-indicators {
+    position: absolute;
+    left: 58%;
+    bottom: 4px;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 8px;
+    transform: translateX(-50%);
 }
 .sponsor-indicators button {
     width: 9px;
@@ -552,7 +584,7 @@ button, input, select { font: inherit; }
     border: 0;
     border-radius: 50%;
     cursor: pointer;
-    background: rgba(255, 255, 255, .35);
+    background: rgba(255, 255, 255, .38);
     transition: background-color .2s ease, transform .2s ease;
 }
 .sponsor-indicators button.is-active {
@@ -565,10 +597,13 @@ button, input, select { font: inherit; }
 }
 @media (max-width: 760px) {
     .sponsor-strip {
-        grid-template-columns: max-content minmax(0, 1fr) auto;
-        gap: 12px;
-        min-height: 68px;
-        padding: 8px 18px;
+        min-height: 72px;
+        padding: 7px 14px;
+    }
+    .sponsor-strip-inner {
+        min-height: 58px;
+        grid-template-columns: max-content 1px minmax(100px, 1fr) minmax(86px, 26vw);
+        gap: 10px;
     }
     .sponsor-label {
         min-height: 30px;
@@ -576,11 +611,17 @@ button, input, select { font: inherit; }
         font-size: 8px;
         letter-spacing: .12em;
     }
-    .sponsor-carousel {
-        height: 48px;
-        border-radius: 6px;
+    .sponsor-divider {
+        height: 42px;
+    }
+    .sponsor-primary,
+    .sponsor-preview {
+        height: 54px;
+        border-radius: 5px;
     }
     .sponsor-indicators {
+        left: 62%;
+        bottom: 1px;
         gap: 5px;
     }
     .sponsor-indicators button {
@@ -588,8 +629,20 @@ button, input, select { font: inherit; }
         height: 7px;
     }
 }
+@media (max-width: 420px) {
+    .sponsor-label {
+        max-width: 68px;
+        padding: 0 7px;
+        font-size: 7px;
+    }
+    .sponsor-strip-inner {
+        grid-template-columns: max-content 1px minmax(86px, 1fr) 82px;
+        gap: 8px;
+    }
+}
 @media (prefers-reduced-motion: reduce) {
-    .sponsor-logo, .sponsor-indicators button {
+    .sponsor-primary img,
+    .sponsor-indicators button {
         transition: none;
     }
 }
