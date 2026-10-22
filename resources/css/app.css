@@ -525,19 +525,31 @@ button, input, select { font: inherit; }
     letter-spacing: .22em;
     text-transform: uppercase;
 }
-.sponsor-cards {
+.sponsor-logos {
     min-width: 0;
-    display: grid;
-    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
-    gap: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 42px;
+    padding: 6px 32px;
 }
-.sponsor-cards img {
-    width: 100%;
-    height: 150px;
+.sponsor-logo {
+    height: 142px;
     display: block;
-    border: 0;
-    border-radius: 22px;
-    object-fit: cover;
+    object-fit: contain;
+}
+.sponsor-logo--disa {
+    width: min(32%, 340px);
+}
+.sponsor-logo--arcelor {
+    width: min(52%, 600px);
+    filter: brightness(0) invert(1);
+}
+.sponsor-divider {
+    width: 2px;
+    height: 112px;
+    flex: 0 0 auto;
+    background: rgba(255, 255, 255, .82);
 }
 @media (max-width: 980px) {
     .sponsor-banner {
@@ -559,9 +571,15 @@ button, input, select { font: inherit; }
     .sponsor-heading h2 {
         font-size: 18px;
     }
-    .sponsor-cards img {
-        height: 110px;
-        border-radius: 16px;
+    .sponsor-logos {
+        gap: 24px;
+        padding: 4px 14px;
+    }
+    .sponsor-logo {
+        height: 104px;
+    }
+    .sponsor-divider {
+        height: 82px;
     }
 }
 @media (max-width: 640px) {
@@ -587,12 +605,21 @@ button, input, select { font: inherit; }
         font-size: 12px;
         letter-spacing: .2em;
     }
-    .sponsor-cards {
-        gap: 7px;
+    .sponsor-logos {
+        gap: 12px;
+        padding: 2px 4px;
     }
-    .sponsor-cards img {
-        height: auto;
-        aspect-ratio: auto;
-        border-radius: 10px;
+    .sponsor-logo {
+        height: 70px;
+    }
+    .sponsor-logo--disa {
+        width: 34%;
+    }
+    .sponsor-logo--arcelor {
+        width: 54%;
+    }
+    .sponsor-divider {
+        width: 1px;
+        height: 58px;
     }
 }
