@@ -353,8 +353,8 @@ function SponsorBanner() {
                     <h2 id="sponsor-title">Patrocínio</h2>
                 </div>
                 <div className="sponsor-cards">
-                    <img src="/images/sponsors/ideal-grupo.jpg" alt="Ideal Grupo" />
-                    <img src="/images/sponsors/disa-arcelormittal.jpg" alt="Disa Ferro-Aço e ArcelorMittal" />
+                    <img src="/images/sponsors/ideal-grupo-card-v2.jpg" alt="Ideal Grupo" />
+                    <img src="/images/sponsors/disa-arcelormittal-card-v2.jpg" alt="Disa Ferro-Aço e ArcelorMittal" />
                 </div>
             </div>
         </section>
