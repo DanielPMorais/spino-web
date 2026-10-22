@@ -45,19 +45,6 @@ const competitionPhotos = [
         edition: 'Competição 2025',
     },
 ];
-const sponsors = [
-    {
-        src: '/images/sponsors/ideal-grupo.jpg',
-        alt: 'Ideal Grupo',
-        className: 'sponsor-logo sponsor-logo-ideal',
-    },
-    {
-        src: '/images/sponsors/disa-arcelormittal.jpg',
-        alt: 'Disa Ferro-Aço e ArcelorMittal',
-        className: 'sponsor-logo sponsor-logo-disa',
-    },
-];
-
 const campusCourses = [
     'Técnico em Administração',
     'Técnico em Edificações',
@@ -115,7 +102,7 @@ export default function Create({ availability, registrationEndsAt, emailVerifica
             <Head title="Inscrição — Concurso de Pontes de Palito" />
             <div className="registration-page">
                 <EventHeader />
-                <SponsorCarousel />
+                <SponsorBanner />
 
                 <main className="registration-stage">
                     {hasSuccess && !successDismissed ? (
@@ -358,50 +345,16 @@ function EventHeader() {
     );
 }
 
-function SponsorCarousel() {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const nextIndex = (activeIndex + 1) % sponsors.length;
-
-    useEffect(() => {
-        const timer = window.setInterval(() => {
-            setActiveIndex((current) => (current + 1) % sponsors.length);
-        }, 6000);
-
-        return () => window.clearInterval(timer);
-    }, []);
-
+function SponsorBanner() {
     return (
-        <section className="sponsor-strip" aria-label="Patrocinadores da competição">
-            <div className="sponsor-strip-inner">
-                <span className="sponsor-label">Patrocínio</span>
-                <i className="sponsor-divider" aria-hidden="true" />
-
-                <div className="sponsor-primary" aria-live="off">
-                    {sponsors.map((sponsor, index) => (
-                        <img
-                            key={sponsor.src}
-                            className={index === activeIndex ? 'is-active' : ''}
-                            src={sponsor.src}
-                            alt={index === activeIndex ? sponsor.alt : ''}
-                        />
-                    ))}
+        <section className="sponsor-banner" aria-labelledby="sponsor-title">
+            <div className="sponsor-banner-inner">
+                <div className="sponsor-heading">
+                    <h2 id="sponsor-title">Patrocínio</h2>
                 </div>
-
-                <div className="sponsor-preview" aria-hidden="true">
-                    <img src={sponsors[nextIndex].src} alt="" />
-                </div>
-
-                <div className="sponsor-indicators" aria-label="Selecione um patrocinador">
-                    {sponsors.map((sponsor, index) => (
-                        <button
-                            key={sponsor.src}
-                            type="button"
-                            className={index === activeIndex ? 'is-active' : ''}
-                            aria-label={`Exibir patrocinador: ${sponsor.alt}`}
-                            aria-pressed={index === activeIndex}
-                            onClick={() => setActiveIndex(index)}
-                        />
-                    ))}
+                <div className="sponsor-cards">
+                    <img src="/images/sponsors/ideal-grupo.jpg" alt="Ideal Grupo" />
+                    <img src="/images/sponsors/disa-arcelormittal.jpg" alt="Disa Ferro-Aço e ArcelorMittal" />
                 </div>
             </div>
         </section>
