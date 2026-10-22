@@ -46,13 +46,13 @@ export default function TestRunsIndex({ teams, devices, runs }) {
             </section>
             <section className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm sm:p-7">
                 <div><p className="text-xs font-bold uppercase tracking-[.14em] text-sky-700">Rastreabilidade</p><h2 className="mt-1 text-xl font-bold">Ensaios recentes</h2><p className="mt-1 text-sm text-slate-500">M2 consulta o vínculo armado e envia medições com o ID único do ensaio.</p></div>
-                <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm">
+                <div className="admin-table-wrap mt-6 overflow-x-auto"><table className="admin-responsive-table w-full min-w-[680px] text-left text-sm">
                     <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-500"><tr><th className="rounded-l-md px-4 py-3">Equipe</th><th className="px-4 py-3">M2</th><th className="px-4 py-3">Estado</th><th className="rounded-r-md px-4 py-3 text-right">Ações</th></tr></thead>
                     <tbody className="divide-y divide-slate-200">{runs.map((run) => <tr key={run.id} className="hover:bg-slate-50/70">
-                        <td className="px-4 py-4"><strong className="block">{run.team.name}</strong><small className="font-mono text-xs text-slate-500">{run.team.code} · {run.uuid.slice(0, 8)}</small></td>
-                        <td className="px-4 py-4 font-semibold">{run.deviceCode}</td>
-                        <td className="px-4 py-4"><StatusBadge value={run.status} /></td>
-                        <td className="px-4 py-4 text-right">{['armed', 'running'].includes(run.status) && <div className="flex justify-end gap-3">{run.status === 'armed' && <button type="button" onClick={() => action(run, 'start')} className="font-semibold text-sky-700 hover:text-sky-900">Iniciar</button>}<button type="button" onClick={() => action(run, 'finish')} className="font-semibold text-emerald-700 hover:text-emerald-900">Encerrar</button><button type="button" onClick={() => action(run, 'cancel')} className="font-semibold text-rose-700 hover:text-rose-900">Cancelar</button></div>}</td>
+                        <td data-label="Equipe" className="px-4 py-4"><strong className="block">{run.team.name}</strong><small className="font-mono text-xs text-slate-500">{run.team.code} · {run.uuid.slice(0, 8)}</small></td>
+                        <td data-label="M2" className="px-4 py-4 font-semibold">{run.deviceCode}</td>
+                        <td data-label="Estado" className="px-4 py-4"><StatusBadge value={run.status} /></td>
+                        <td data-label="Ações" className="px-4 py-4 text-right">{['armed', 'running'].includes(run.status) && <div className="flex justify-end gap-3">{run.status === 'armed' && <button type="button" onClick={() => action(run, 'start')} className="font-semibold text-sky-700 hover:text-sky-900">Iniciar</button>}<button type="button" onClick={() => action(run, 'finish')} className="font-semibold text-emerald-700 hover:text-emerald-900">Encerrar</button><button type="button" onClick={() => action(run, 'cancel')} className="font-semibold text-rose-700 hover:text-rose-900">Cancelar</button></div>}</td>
                     </tr>)}</tbody>
                 </table>{!runs.length && <p className="py-12 text-center text-sm text-slate-500">Nenhum ensaio registrado.</p>}</div>
             </section>

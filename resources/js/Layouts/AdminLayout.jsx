@@ -30,7 +30,7 @@ export default function AdminLayout({ title, description, children, actions = nu
             {menuOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <button type="button" aria-label="Fechar menu" className="absolute inset-0 bg-slate-950/55" onClick={() => setMenuOpen(false)} />
-                    <aside className="relative flex h-full w-[min(84vw,320px)] flex-col bg-[#172938] text-white shadow-2xl">
+                    <aside className="relative flex h-full w-[min(88vw,320px)] flex-col overflow-hidden bg-[#172938] text-white shadow-2xl">
                         <div className="flex items-center justify-between pr-4"><AdminBrand /><button type="button" onClick={() => setMenuOpen(false)} className="grid size-10 place-items-center rounded-lg text-2xl text-slate-300 hover:bg-white/10">×</button></div>
                         <AdminNavigation onNavigate={() => setMenuOpen(false)} />
                         <div className="mt-auto border-t border-white/10 p-4"><ExternalLinks /><UserSummary user={auth.user} /></div>
@@ -40,23 +40,23 @@ export default function AdminLayout({ title, description, children, actions = nu
 
             <div className="lg:pl-64">
                 <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-                    <div className="flex min-h-16 items-center justify-between gap-4 px-5 sm:px-8">
+                    <div className="flex min-h-16 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-8">
                         <div className="flex min-w-0 items-center gap-3">
                             <button type="button" aria-label="Abrir menu" onClick={() => setMenuOpen(true)} className="grid size-10 shrink-0 place-items-center rounded-lg border border-slate-200 text-xl lg:hidden">☰</button>
                             <div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-500">Administração</p><p className="truncate font-bold text-slate-800">{title}</p></div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 sm:gap-3">
                             <span className="hidden text-sm font-semibold text-slate-600 sm:block">{auth.user.name}</span>
-                            <span className="grid size-9 place-items-center rounded-full bg-slate-200 font-bold text-[#172938]">{auth.user.name.charAt(0).toUpperCase()}</span>
-                            <Link href={route('logout')} method="post" as="button" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800">Sair</Link>
+                            <span className="hidden size-9 place-items-center rounded-full bg-slate-200 font-bold text-[#172938] sm:grid">{auth.user.name.charAt(0).toUpperCase()}</span>
+                            <Link href={route('logout')} method="post" as="button" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 sm:px-3">Sair</Link>
                         </div>
                     </div>
                 </header>
 
-                <main className="mx-auto max-w-[1440px] px-5 py-7 sm:px-8 sm:py-9">
+                <main className="mx-auto max-w-[1440px] px-4 py-6 sm:px-8 sm:py-9">
                     <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                        <div><p className="text-xs font-bold uppercase tracking-[.14em] text-sky-700">IFSP · Organização do Concurso de Pontes</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{title}</h1>{description && <p className="mt-2 max-w-2xl text-slate-500">{description}</p>}</div>
-                        {actions && <div className="flex shrink-0 flex-wrap gap-3">{actions}</div>}
+                        <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[.12em] text-sky-700 sm:tracking-[.14em]">IFSP · Organização do Concurso de Pontes</p><h1 className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>{description && <p className="mt-2 max-w-2xl text-sm text-slate-500 sm:text-base">{description}</p>}</div>
+                        {actions && <div className="flex w-full shrink-0 flex-wrap gap-3 [&>*]:w-full sm:w-auto sm:[&>*]:w-auto">{actions}</div>}
                     </div>
                     {children}
                 </main>
@@ -71,7 +71,7 @@ function AdminBrand() {
 
 function AdminNavigation({ onNavigate }) {
     const { auth } = usePage().props;
-    return <nav className="grid gap-1 px-3 py-5" aria-label="Navegação administrativa">{navigation.filter((item) => !item.requiresUserManagement || auth.canManageUsers).map((item) => {
+    return <nav className="grid min-h-0 flex-1 content-start gap-1 overflow-y-auto px-3 py-5" aria-label="Navegação administrativa">{navigation.filter((item) => !item.requiresUserManagement || auth.canManageUsers).map((item) => {
         const active = route().current(item.active);
         return <Link key={item.routeName} href={route(item.routeName)} onClick={onNavigate} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${active ? 'bg-white text-[#172938] shadow' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}><AdminIcon name={item.icon} />{item.label}</Link>;
     })}</nav>;
